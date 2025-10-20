@@ -1,27 +1,30 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import CreateRequestModal from "../../components/CreateRequestModal";
+import CreatePostModal from "../../components/CreatePostModal";
 
-type RequestType =
-  | "i can help with"
-  | "i need help with"
-  | "i need a test evaluation for"
-  | "i can do a test eval for";
+type PostType = "offer" | "request";
 
-type RequestItem = {
+type PostSubtype =
+  | "help with project"
+  | "need help with project" 
+  | "test evaluation"
+  | "can do test evaluation";
+
+type PostItem = {
   id: string;
   title: string;
   description: string;
   tags: string[];
-  type: RequestType;
+  type: PostType;
+  subtype: PostSubtype;
   createdAt: string;
 };
 
-const STORAGE_KEY = "my_requests_v1";
+const STORAGE_KEY = "my_posts_v1";
 
-export default function MyRequestsPage() {
-  const [items, setItems] = useState<RequestItem[]>([]);
+export default function MyPostsPage() {
+  const [items, setItems] = useState<PostItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -29,7 +32,7 @@ export default function MyRequestsPage() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) setItems(JSON.parse(raw));
     } catch (e) {
-      console.error("Failed to read requests from localStorage", e);
+      console.error("Failed to read posts from localStorage", e);
     }
   }, []);
 
@@ -37,26 +40,26 @@ export default function MyRequestsPage() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch (e) {
-      console.error("Failed to store requests", e);
+      console.error("Failed to store posts", e);
     }
   }, [items]);
 
-  const addRequest = (newRequest: RequestItem) => {
-    setItems((s) => [newRequest, ...s]);
+  const addPost = (newPost: PostItem) => {
+    setItems((s) => [newPost, ...s]);
   };
 
-  const removeRequest = (id: string) =>
+  const removePost = (id: string) =>
     setItems((s) => s.filter((i) => i.id !== id));
 
   return (
     <div className="flex-1 relative">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-white">My Requests</h1>
+        <h1 className="text-3xl font-bold text-white">My Posts</h1>
         <button
           className="btn btn-primary btn-circle btn-lg"
           onClick={() => setIsModalOpen(true)}
-          title="Create new request"
+          title="Create new post"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -75,18 +78,18 @@ export default function MyRequestsPage() {
         </button>
       </div>
 
-      {/* Requests List */}
+      {/* Posts List */}
       <div className="space-y-4">
         {items.length === 0 && (
           <div className="text-center py-12">
             <div className="text-neutral-400 text-lg mb-4">
-              No requests yet
+              No posts yet
             </div>
             <button
               className="btn btn-primary"
               onClick={() => setIsModalOpen(true)}
             >
-              Create your first request
+              Create your first post
             </button>
           </div>
         )}
@@ -99,8 +102,11 @@ export default function MyRequestsPage() {
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="badge badge-outline text-xs">
+                  <span className={`badge ${it.type === 'offer' ? 'badge-success' : 'badge-info'}`}>
                     {it.type}
+                  </span>
+                  <span className="badge badge-outline text-xs">
+                    {it.subtype}
                   </span>
                   <span className="text-xs text-neutral-500">
                     {new Date(it.createdAt).toLocaleString()}
@@ -146,7 +152,7 @@ export default function MyRequestsPage() {
                 </button>
                 <button
                   className="btn btn-sm btn-error"
-                  onClick={() => removeRequest(it.id)}
+                  onClick={() => removePost(it.id)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -169,11 +175,11 @@ export default function MyRequestsPage() {
         ))}
       </div>
 
-      {/* Create Request Modal */}
-      <CreateRequestModal
+      {/* Create Post Modal */}
+      <CreatePostModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onAddRequest={addRequest}
+        onAddPost={addPost}
       />
     </div>
   );
