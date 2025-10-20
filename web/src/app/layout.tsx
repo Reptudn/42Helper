@@ -32,6 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/visualizer" className="text-blue-600 hover:underline">
                   Visualizer
                 </Link>
+                <Link href="/auth-test" className="text-blue-600 hover:underline">
+                  Auth Test
+                </Link>
               </nav>
               <AuthNavigation />
             </div>
