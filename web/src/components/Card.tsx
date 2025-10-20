@@ -102,28 +102,30 @@ export default function Card({
 
   return (
     <article
-      className="w-80 rounded-2xl overflow-hidden relative"
+      className="w-full max-w-xs sm:max-w-sm md:max-w-md rounded-2xl overflow-hidden relative mx-auto"
       style={{
-        boxShadow: `0 20px 50px rgba(0,0,0,0.6), 0 8px 30px ${hexToRgba(
+        boxShadow: `0 12px 30px rgba(0,0,0,0.5), 0 8px 24px ${hexToRgba(
           colors.border,
           0.12
         )}`,
       }}
     >
       <div
-        className="p-4 rounded-2xl"
+        className="p-4 sm:p-6 rounded-2xl"
         style={{
           background: colors.bg,
-          border: `6px solid ${colors.border}`,
+          border: `4px solid ${colors.border}`,
         }}
       >
         <header className="text-center">
-          <h2 className="text-3xl font-extrabold text-black">{projectTitle}</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-black">
+            {projectTitle}
+          </h2>
         </header>
 
         <hr className="my-3 border-black/10" />
 
-        <p className="text-sm italic text-black/80 min-h-[3.5rem]">
+        <p className="text-sm sm:text-base italic text-black/80 min-h-[3.5rem]">
           {description}
         </p>
 
@@ -134,7 +136,7 @@ export default function Card({
                 key={t + i}
                 className={`badge badge-soft ${
                   badgeVariants[i % badgeVariants.length]
-                } text-sm`}
+                } text-xs sm:text-sm`}
               >
                 {t}
               </span>
@@ -146,26 +148,34 @@ export default function Card({
 
         <hr className="my-3 border-black/10" />
 
-        <footer className="flex items-center gap-3">
-          <span className="text-black/90 font-semibold">from</span>
-          <a
-            href={`https://profile.intra.42.fr/users/${encodeURIComponent(
-              intraName
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 no-underline"
-            aria-label={`Open ${intraName} profile in new tab`}
-          >
-            <Image
-              src={userImageUrl}
-              alt={`${intraName} avatar`}
-              width={44}
-              height={44}
-              className="rounded-full"
-            />
-            <span className="text-black/90 font-semibold">{intraName}</span>
-          </a>
+        <footer className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-black/90 font-semibold">from</span>
+            <a
+              href={`https://profile.intra.42.fr/users/${encodeURIComponent(
+                intraName
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 no-underline"
+              aria-label={`Open ${intraName} profile in new tab`}
+            >
+              <Image
+                src={userImageUrl}
+                alt={`${intraName} avatar`}
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <span className="text-black/90 font-semibold text-sm sm:text-base">
+                {intraName}
+              </span>
+            </a>
+          </div>
+
+          <div className="text-right text-xs text-black/60 hidden sm:block">
+            {/* place for small metadata */}
+          </div>
         </footer>
       </div>
     </article>
