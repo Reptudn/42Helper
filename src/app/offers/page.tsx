@@ -15,7 +15,6 @@ export default function OfferHelpPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get all records from "offers" collection
         const records = await pb.collection("offers").getFullList<HelpPost>(200);
         setPosts(records);
       } catch (error) {
