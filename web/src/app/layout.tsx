@@ -34,7 +34,6 @@ export default function RootLayout({
                     42 Helper
                   </span>
                 </Link>
-<<<<<<< HEAD
 
                 {/* Nav buttons */}
                 <nav className="hidden sm:flex items-center gap-2">
@@ -69,22 +68,6 @@ export default function RootLayout({
                 {/* <LoginWithIntra href="/api/auth/intra" /> */}
                 <AuthNavigation />
               </div>
-=======
-                <Link href="/requests" className="text-blue-600 hover:underline">
-                  Requests
-                </Link>
-                <Link href="/offers" className="text-blue-600 hover:underline">
-                  Offers
-                </Link>
-                <Link href="/my-requests" className="text-blue-600 hover:underline">
-                  My Requests
-                </Link>
-                <Link href="/visualizer" className="text-blue-600 hover:underline">
-                  Visualizer
-                </Link>
-              </nav>
-              <AuthNavigation />
->>>>>>> 0dc036838eb8b51b7d6bafcc83d9c63b655ef298
             </div>
           </header>
 
