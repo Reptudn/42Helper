@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { pb } from "../../lib/pocketbaseClient";
+import { config } from "../../lib/config";
 
 interface HelpRequest {
   id: string;
@@ -19,10 +20,10 @@ export default function RequestsPage() {
       try {
         setLoading(true);
         setError(null);
-        console.log("Fetching from requests collection...");
+        console.log(`Fetching from ${config.collections.requests} collection...`);
         
-        // Get all records from "requests" collection
-        const records = await pb.collection("requests").getFullList<HelpRequest>(200);
+        // Get all records from the requests collection
+        const records = await pb.collection(config.collections.requests).getFullList<HelpRequest>(200);
         console.log("Successfully fetched requests:", records);
         setRequests(records);
       } catch (error: unknown) {
@@ -57,9 +58,9 @@ export default function RequestsPage() {
           <p className="font-semibold">Configuration Issue:</p>
           <p>{error}</p>
           <p className="mt-2 text-sm">
-            Go to <a href="http://91.98.148.201:8090/_/" className="underline" target="_blank" rel="noopener noreferrer">
+            Go to <a href={config.pocketbase.adminUrl} className="underline" target="_blank" rel="noopener noreferrer">
               PocketBase Admin
-            </a> → Collections → requests → API Rules and set List/Search rule to empty string (&quot;&quot;) for public access.
+            </a> → Collections → {config.collections.requests} → API Rules and set List/Search rule to empty string (&quot;&quot;) for public access.
           </p>
         </div>
       )}
