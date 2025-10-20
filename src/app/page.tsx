@@ -1,33 +1,10 @@
-import "./globals.css";
-import Link from "next/link";
-
-export const metadata = {
-  title: "42 Helper",
-  description: "Connect students who need help with those ready to help.",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function Home() {
   return (
-    <html lang="en">
-      <body className="antialiased bg-gray-50 text-gray-900">
-        <header className="bg-white shadow-md p-4">
-          <nav className="max-w-6xl mx-auto flex space-x-6">
-            <Link href="/" className="text-blue-600 hover:underline">
-              Home
-            </Link>
-            <Link href="/find-help" className="text-blue-600 hover:underline">
-              Find Help
-            </Link>
-            <Link href="/offer-help" className="text-blue-600 hover:underline">
-              Offer Help
-            </Link>
-            <Link href="/my-requests" className="text-blue-600 hover:underline">
-              My Requests
-            </Link>
-          </nav>
-        </header>
-        <main className="max-w-6xl mx-auto p-6">{children}</main>
-      </body>
-    </html>
+    <div className="bg-white p-8 rounded-lg shadow-md text-center">
+      <h1 className="text-4xl font-bold mb-4">Welcome to 42 Helper</h1>
+      <p className="text-gray-600 text-lg">
+        A platform that connects 42 students who need help with those eager to offer it.
+      </p>
+    </div>
   );
 }
