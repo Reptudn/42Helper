@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function AuthNavigation() {
-  const { user, logout, isLoading } = useAuth();
+  const { user, logout, login, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -17,7 +17,25 @@ export default function AuthNavigation() {
   if (user) {
     return (
       <div className="flex items-center space-x-4">
-        <span className="text-gray-700">Welcome, {user.name || user.email}!</span>
+        {user.image && (
+          <Image 
+            src={user.image} 
+            alt="Profile" 
+            width={32}
+            height={32}
+            className="rounded-full"
+          />
+        )}
+        <div className="text-sm">
+          <div className="text-gray-700 font-medium">
+            {user.name || user.login || user.email}
+          </div>
+          {user.campus && (
+            <div className="text-gray-500 text-xs">
+              {user.campus} {user.level && `• Level ${user.level.toFixed(2)}`}
+            </div>
+          )}
+        </div>
         <button
           onClick={logout}
           className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -30,18 +48,12 @@ export default function AuthNavigation() {
 
   return (
     <div className="flex space-x-4">
-      <Link
-        href="/login"
-        className="text-blue-600 hover:underline px-3 py-2"
-      >
-        Login
-      </Link>
-      <Link
-        href="/register"
+      <button
+        onClick={login}
         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
-        Register
-      </Link>
+        Login with 42
+      </button>
     </div>
   );
 }

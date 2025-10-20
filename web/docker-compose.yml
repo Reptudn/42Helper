@@ -1,0 +1,14 @@
+services:
+  # Production service: builds the production image and runs it
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npm start
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+    env_file:
+      - .env
+    restart: unless-stopped

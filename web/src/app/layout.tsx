@@ -2,7 +2,6 @@ import "./globals.css";
 import Link from "next/link";
 import { AuthProvider } from "../contexts/AuthContext";
 import AuthNavigation from "../components/AuthNavigation";
-import LoginWithIntra from "@/components/LoginWithIntra";
 
 export const metadata = {
   title: "42 Helper",
@@ -65,8 +64,8 @@ export default function RootLayout({
               </div>
 
               <div className="flex items-center gap-3">
-                <LoginWithIntra href="/api/auth/intra" />
-                {/* <AuthNavigation /> */}
+                {/* <LoginWithIntra href="/api/auth/intra" /> */}
+                <AuthNavigation />
               </div>
             </div>
           </header>

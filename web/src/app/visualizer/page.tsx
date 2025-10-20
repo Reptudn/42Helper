@@ -3,6 +3,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import Card from "@/components/Card";
 
+// Helper types to avoid `any` while supporting vendor-prefixed fullscreen APIs
+type PrefixedDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  mozFullScreenElement?: Element | null;
+  msFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+  mozCancelFullScreen?: () => Promise<void> | void;
+  msExitFullscreen?: () => Promise<void> | void;
+};
+
+type PrefixedElement = Element & {
+  webkitRequestFullscreen?: () => Promise<void> | void;
+  msRequestFullscreen?: () => Promise<void> | void;
+};
+
 const SAMPLE = Array.from({ length: 12 }).map((_, i) => ({
   id: `s${i}`,
   title: `Project ${i + 1}`,
@@ -19,11 +34,12 @@ export default function VisualizerPage() {
 
   useEffect(() => {
     const onChange = () => {
+      const doc = document as PrefixedDocument;
       const fs = !!(
         document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).mozFullScreenElement ||
-        (document as any).msFullscreenElement
+        doc.webkitFullscreenElement ||
+        doc.mozFullScreenElement ||
+        doc.msFullscreenElement
       );
       setIsFullscreen(fs);
     };
@@ -35,35 +51,60 @@ export default function VisualizerPage() {
     };
 
     document.addEventListener("fullscreenchange", onChange);
-    document.addEventListener("webkitfullscreenchange", onChange as any);
-    document.addEventListener("mozfullscreenchange", onChange as any);
-    document.addEventListener("MSFullscreenChange", onChange as any);
+    document.addEventListener(
+      "webkitfullscreenchange",
+      onChange as EventListener
+    );
+    document.addEventListener("mozfullscreenchange", onChange as EventListener);
+    document.addEventListener("MSFullscreenChange", onChange as EventListener);
     document.addEventListener("keydown", onKey);
 
     return () => {
       document.removeEventListener("fullscreenchange", onChange);
-      document.removeEventListener("webkitfullscreenchange", onChange as any);
-      document.removeEventListener("mozfullscreenchange", onChange as any);
-      document.removeEventListener("MSFullscreenChange", onChange as any);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        onChange as EventListener
+      );
+      document.removeEventListener(
+        "mozfullscreenchange",
+        onChange as EventListener
+      );
+      document.removeEventListener(
+        "MSFullscreenChange",
+        onChange as EventListener
+      );
       document.removeEventListener("keydown", onKey);
     };
   }, []);
 
   const enterFullscreen = async () => {
-    const el = containerRef.current ?? document.documentElement;
-    if (el.requestFullscreen) await el.requestFullscreen();
-    else if ((el as any).webkitRequestFullscreen)
-      await (el as any).webkitRequestFullscreen();
-    else if ((el as any).msRequestFullscreen)
-      await (el as any).msRequestFullscreen();
+    const el = (containerRef.current ?? document.documentElement) as
+      | PrefixedElement
+      | Element;
+    if (
+      "requestFullscreen" in el &&
+      typeof (el as Element).requestFullscreen === "function"
+    ) {
+      await (el as Element).requestFullscreen();
+    } else if ((el as PrefixedElement).webkitRequestFullscreen) {
+      await (el as PrefixedElement).webkitRequestFullscreen!();
+    } else if ((el as PrefixedElement).msRequestFullscreen) {
+      await (el as PrefixedElement).msRequestFullscreen!();
+    }
   };
 
   const exitFullscreen = async () => {
-    if (document.exitFullscreen) await document.exitFullscreen();
-    else if ((document as any).webkitExitFullscreen)
-      await (document as any).webkitExitFullscreen();
-    else if ((document as any).msExitFullscreen)
-      await (document as any).msExitFullscreen();
+    const doc = document as PrefixedDocument;
+    if (
+      "exitFullscreen" in document &&
+      typeof document.exitFullscreen === "function"
+    ) {
+      await document.exitFullscreen();
+    } else if (doc.webkitExitFullscreen) {
+      await doc.webkitExitFullscreen!();
+    } else if (doc.msExitFullscreen) {
+      await doc.msExitFullscreen!();
+    }
   };
 
   return (
