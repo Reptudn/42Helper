@@ -41,16 +41,3 @@ USER app
 
 # Default start command (expects package.json start to run next start)
 CMD ["npm", "start"]
-FROM node:22-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-EXPOSE 3000
-
-CMD ["npm", "start"]

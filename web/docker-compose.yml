@@ -1,22 +1,6 @@
 version: "3.8"
 
 services:
-  # Development service: mounts source, exposes port and runs dev server
-  web-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: npm run dev
-    ports:
-      - "4242:3000"
-    volumes:
-      - .:/app:cached
-      - /app/node_modules
-    environment:
-      NODE_ENV: development
-    stdin_open: true
-    tty: true
-
   # Production service: builds the production image and runs it
   web:
     build:
