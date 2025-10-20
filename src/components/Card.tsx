@@ -25,19 +25,96 @@ export default function Card({
     "badge-warning",
   ];
 
+  // Map project types (projectTitle) to a specific background gradient, border color and text color.
+  const hexToRgba = (hex: string, alpha = 1) => {
+    const h = hex.replace("#", "");
+    const bigint = parseInt(
+      h.length === 3
+        ? h
+            .split("")
+            .map((c) => c + c)
+            .join("")
+        : h,
+      16
+    );
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
+  const getProjectColors = (projectType?: string) => {
+    const key = (projectType || "").toLowerCase();
+    const map: Record<string, { bg: string; border: string; text: string }> = {
+      // Colors based on the picture you provided
+      libft: {
+        bg: "linear-gradient(180deg,#fff7c2 0%, #ffe98a 100%)",
+        border: "#ffd54f",
+        text: "#000",
+      },
+      ft_printf: {
+        bg: "linear-gradient(180deg,#ffd6ee 0%, #ffb0da 100%)",
+        border: "#ff78b6",
+        text: "#000",
+      },
+      printf: {
+        bg: "linear-gradient(180deg,#ffd6ee 0%, #ffb0da 100%)",
+        border: "#ff78b6",
+        text: "#000",
+      },
+      get_next_line: {
+        bg: "linear-gradient(180deg,#e6ffef 0%, #bfffd6 100%)",
+        border: "#7bf5a1",
+        text: "#000",
+      },
+      push_swap: {
+        bg: "linear-gradient(180deg,#e6f6ff 0%, #cfefff 100%)",
+        border: "#6fcfff",
+        text: "#000",
+      },
+      minishell: {
+        bg: "linear-gradient(180deg,#ffdede 0%, #ffb0b0 100%)",
+        border: "#ff6b6b",
+        text: "#000",
+      },
+      philosophers: {
+        bg: "linear-gradient(180deg,#f3f3f3 0%, #e6e6e6 100%)",
+        border: "#cfcfcf",
+        text: "#111",
+      },
+      philosopher: {
+        bg: "linear-gradient(180deg,#f3f3f3 0%, #e6e6e6 100%)",
+        border: "#cfcfcf",
+        text: "#111",
+      },
+      // fallback for all other projects
+      other: {
+        bg: "linear-gradient(180deg,#efe6ff 0%, #d6c1ff 100%)",
+        border: "#a178ff",
+        text: "#000",
+      },
+    };
+
+    return map[key] ?? map.other;
+  };
+
+  const colors = getProjectColors(projectTitle);
+
   return (
     <article
       className="w-80 rounded-2xl overflow-hidden relative"
       style={{
-        boxShadow:
-          "0 20px 50px rgba(0,0,0,0.6), 0 0 40px rgba(255, 184, 0, 0.06) inset",
+        boxShadow: `0 20px 50px rgba(0,0,0,0.6), 0 8px 30px ${hexToRgba(
+          colors.border,
+          0.12
+        )}`,
       }}
     >
       <div
         className="p-4 rounded-2xl"
         style={{
-          background: "linear-gradient(180deg,#ff9a3d 0%, #ff7a18 100%)",
-          border: "6px solid #ffdf6b",
+          background: colors.bg,
+          border: `6px solid ${colors.border}`,
         }}
       >
         <header className="text-center">
@@ -70,6 +147,7 @@ export default function Card({
         <hr className="my-3 border-black/10" />
 
         <footer className="flex items-center gap-3">
+          <span className="text-black/90 font-semibold">from</span>
           <a
             href={`https://profile.intra.42.fr/users/${encodeURIComponent(
               intraName
