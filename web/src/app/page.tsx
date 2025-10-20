@@ -18,7 +18,7 @@ type PBItem = {
   intraName?: string;
   owner?: string;
   user?: string;
-} & Record<string, any>;
+} & Record<string, unknown>;
 
 export default function Home() {
   const [requests, setRequests] = useState<PBItem[]>([]);
