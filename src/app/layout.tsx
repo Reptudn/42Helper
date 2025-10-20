@@ -25,8 +25,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/my-requests" className="text-blue-600 hover:underline">
               My Requests
             </Link>
-            <Link href="/visualiser" className="text-blue-600 hover:underline">
-              Visualiser
+            <Link href="/visualizer" className="text-blue-600 hover:underline">
+              Visualizer
             </Link>
           </nav>
         </header>
