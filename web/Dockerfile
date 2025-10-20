@@ -6,7 +6,8 @@ WORKDIR /app
 
 # Install build dependencies
 COPY package*.json ./
-RUN npm ci --only=production || npm install
+# Install all dependencies (including devDependencies) so tools like typescript are available for the build step
+RUN npm ci || npm install
 
 # Copy rest of the sources
 COPY . .
