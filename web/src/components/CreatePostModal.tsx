@@ -2,37 +2,41 @@
 
 import React, { useState } from "react";
 
-type RequestType =
-  | "i can help with"
-  | "i need help with"
-  | "i need a test evaluation for"
-  | "i can do a test eval for";
+type PostType = "offer" | "request";
 
-type RequestItem = {
+type PostSubtype =
+  | "help with project"
+  | "need help with project" 
+  | "test evaluation"
+  | "can do test evaluation";
+
+type PostItem = {
   id: string;
   title: string;
   description: string;
   tags: string[];
-  type: RequestType;
+  type: PostType;
+  subtype: PostSubtype;
   createdAt: string;
 };
 
-interface CreateRequestModalProps {
+interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddRequest: (request: RequestItem) => void;
+  onAddPost: (post: PostItem) => void;
 }
 
-export default function CreateRequestModal({
+export default function CreatePostModal({
   isOpen,
   onClose,
-  onAddRequest,
-}: CreateRequestModalProps) {
+  onAddPost,
+}: CreatePostModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [typeValue, setTypeValue] = useState<RequestType>("i need help with");
+  const [postType, setPostType] = useState<PostType>("request");
+  const [subtype, setSubtype] = useState<PostSubtype>("need help with project");
 
   const addTag = () => {
     const t = tagInput.trim();
@@ -46,23 +50,25 @@ export default function CreateRequestModal({
   const handleSubmit = () => {
     if (!title.trim() || !description.trim()) return;
     
-    const item: RequestItem = {
+    const item: PostItem = {
       id: crypto.randomUUID(),
       title: title.trim(),
       description: description.trim(),
       tags,
-      type: typeValue,
+      type: postType,
+      subtype: subtype,
       createdAt: new Date().toISOString(),
     };
     
-    onAddRequest(item);
+    onAddPost(item);
     
     // Reset form
     setTitle("");
     setDescription("");
     setTags([]);
     setTagInput("");
-    setTypeValue("i need help with");
+    setPostType("request");
+    setSubtype("need help with project");
     onClose();
   };
 
@@ -72,7 +78,7 @@ export default function CreateRequestModal({
       <div className={`modal ${isOpen ? "modal-open" : ""}`}>
         <div className="modal-box w-11/12 max-w-2xl bg-neutral-900 border border-neutral-800">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-lg text-white">Create New Request</h3>
+            <h3 className="font-bold text-lg text-white">Create New Post</h3>
             <button
               className="btn btn-sm btn-circle btn-ghost text-white"
               onClick={onClose}
@@ -82,20 +88,27 @@ export default function CreateRequestModal({
           </div>
 
           <div className="space-y-4">
-            {/* Type Selection */}
+            {/* Post Type Selection */}
             <div>
               <label className="label">
-                <span className="label-text text-white">Type</span>
+                <span className="label-text text-white">Post Type</span>
               </label>
               <select
-                value={typeValue}
-                onChange={(e) => setTypeValue(e.target.value as RequestType)}
+                value={postType}
+                onChange={(e) => {
+                  const newType = e.target.value as PostType;
+                  setPostType(newType);
+                  // Auto-set appropriate subtype based on main type
+                  if (newType === "offer") {
+                    setSubtype("help with project");
+                  } else {
+                    setSubtype("need help with project");
+                  }
+                }}
                 className="select select-bordered w-full bg-neutral-800 text-white"
               >
-                <option>i can help with</option>
-                <option>i need help with</option>
-                <option>i need a test evaluation for</option>
-                <option>i can do a test eval for</option>
+                <option value="request">Request</option>
+                <option value="offer">Offer</option>
               </select>
             </div>
 
@@ -110,6 +123,30 @@ export default function CreateRequestModal({
                 className="input input-bordered w-full bg-neutral-800 text-white"
                 placeholder="Short title"
               />
+            </div>
+
+            {/* Subtype Selection */}
+            <div>
+              <label className="label">
+                <span className="label-text text-white">Category</span>
+              </label>
+              <select
+                value={subtype}
+                onChange={(e) => setSubtype(e.target.value as PostSubtype)}
+                className="select select-bordered w-full bg-neutral-800 text-white"
+              >
+                {postType === "offer" ? (
+                  <>
+                    <option value="help with project">Help with project</option>
+                    <option value="can do test evaluation">Can do test evaluation</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="need help with project">Need help with project</option>
+                    <option value="test evaluation">Need test evaluation</option>
+                  </>
+                )}
+              </select>
             </div>
 
             {/* Description */}
@@ -183,7 +220,7 @@ export default function CreateRequestModal({
               disabled={!title.trim() || !description.trim()}
               type="button"
             >
-              Create Request
+              Create Post
             </button>
           </div>
         </div>

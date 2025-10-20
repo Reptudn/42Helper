@@ -31,10 +31,10 @@ export default function Navigation() {
               Offers
             </Link>
             <Link
-              href="/my-requests"
+              href="/my-posts"
               className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
             >
-              My Requests
+              My Posts
             </Link>
             <Link
               href="/visualizer"
