@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 type PostType = "offer" | "request";
 
@@ -37,6 +37,23 @@ export default function CreatePostModal({
   const [tags, setTags] = useState<string[]>([]);
   const [postType, setPostType] = useState<PostType>("request");
   const [subtype, setSubtype] = useState<PostSubtype>("need help with project");
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscKey);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, [isOpen, onClose]);
 
   const addTag = () => {
     const t = tagInput.trim();
