@@ -2,7 +2,6 @@ import "./globals.css";
 import Link from "next/link";
 import { AuthProvider } from "../contexts/AuthContext";
 import AuthNavigation from "../components/AuthNavigation";
-import LoginWithIntra from "@/components/LoginWithIntra";
 
 export const metadata = {
   title: "42 Helper",
