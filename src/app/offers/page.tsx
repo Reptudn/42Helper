@@ -16,20 +16,45 @@ export default function OfferHelpPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Create an AbortController to handle cleanup
+    const controller = new AbortController();
+    
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
         console.log(`Fetching from ${config.collections.offers} collection...`);
         
-        const records = await pb.collection(config.collections.offers).getFullList<HelpPost>(200);
+        // Add a small delay to prevent rapid requests
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const records = await pb.collection(config.collections.offers).getFullList<HelpPost>(200, {
+          // Pass the abort signal to cancel the request if component unmounts
+          signal: controller.signal,
+        });
+        
         console.log("Successfully fetched records:", records);
         setPosts(records);
       } catch (error: unknown) {
+        // Don't show error if request was cancelled due to cleanup
+        if (controller.signal.aborted) {
+          console.log("Request was cancelled (component unmounted)");
+          return;
+        }
+        
         console.error("PocketBase error:", error);
         
         if (error instanceof Error) {
-          if (error.message.includes("superuser")) {
+          if (error.message.includes("autocancelled")) {
+            setError("Request was auto-cancelled. This usually happens due to rapid re-requests. Trying again...");
+            // Retry after a delay
+            setTimeout(() => {
+              if (!controller.signal.aborted) {
+                fetchData();
+              }
+            }, 1000);
+            return;
+          } else if (error.message.includes("superuser")) {
             setError("Collection access restricted. Please set API rules to allow public access in PocketBase admin.");
           } else if (error.message.includes("authorization")) {
             setError("Authentication required. Please configure collection API rules for public access.");
@@ -40,10 +65,18 @@ export default function OfferHelpPage() {
           setError("Unknown error occurred");
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
+
     fetchData();
+
+    // Cleanup function to cancel the request if component unmounts
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   return (
