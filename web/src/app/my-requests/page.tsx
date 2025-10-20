@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import CreateRequestModal from "../../components/CreateRequestModal";
 
 type RequestType =
   | "i can help with"
@@ -21,11 +22,7 @@ const STORAGE_KEY = "my_requests_v1";
 
 export default function MyRequestsPage() {
   const [items, setItems] = useState<RequestItem[]>([]);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [typeValue, setTypeValue] = useState<RequestType>("i need help with");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -44,185 +41,140 @@ export default function MyRequestsPage() {
     }
   }, [items]);
 
-  const addTag = () => {
-    const t = tagInput.trim();
-    if (!t) return;
-    if (!tags.includes(t)) setTags((s) => [...s, t]);
-    setTagInput("");
-  };
-
-  const removeTag = (t: string) => setTags((s) => s.filter((x) => x !== t));
-
-  const addRequest = () => {
-    if (!title.trim() || !description.trim()) return;
-    const item: RequestItem = {
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      description: description.trim(),
-      tags,
-      type: typeValue,
-      createdAt: new Date().toISOString(),
-    };
-    setItems((s) => [item, ...s]);
-    setTitle("");
-    setDescription("");
-    setTags([]);
+  const addRequest = (newRequest: RequestItem) => {
+    setItems((s) => [newRequest, ...s]);
   };
 
   const removeRequest = (id: string) =>
     setItems((s) => s.filter((i) => i.id !== id));
 
   return (
-    <div className="flex-1">
-      <div className="bg-base-100/10 p-6 rounded-xl border border-neutral-800 shadow-sm">
-        <h1 className="text-2xl font-bold mb-4 text-white">My Requests</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-1">
-            <div className="card bg-neutral-900/60 p-4 rounded-lg border border-neutral-800">
-              <label className="label">
-                <span className="label-text text-white">Type</span>
-              </label>
-              <select
-                value={typeValue}
-                onChange={(e) => setTypeValue(e.target.value as RequestType)}
-                className="select select-bordered w-full max-w-xs bg-neutral-800 text-white"
-              >
-                <option>i can help with</option>
-                <option>i need help with</option>
-                <option>i need a test evaluation for</option>
-                <option>i can do a test eval for</option>
-              </select>
-
-              <label className="label mt-4">
-                <span className="label-text text-white">Title</span>
-              </label>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="input input-bordered w-full bg-neutral-800 text-white"
-                placeholder="Short title"
-              />
-
-              <label className="label mt-4">
-                <span className="label-text text-white">Description</span>
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="textarea textarea-bordered w-full bg-neutral-800 text-white"
-                placeholder="Describe what you need or can offer"
-                rows={4}
-              />
-
-              <label className="label mt-4">
-                <span className="label-text text-white">Tags</span>
-              </label>
-              <div className="flex gap-2">
-                <input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && (e.preventDefault(), addTag())
-                  }
-                  className="input input-bordered w-full bg-neutral-800 text-white"
-                  placeholder="press Enter to add"
-                />
-                <button
-                  className="btn btn-primary"
-                  onClick={addTag}
-                  type="button"
-                >
-                  Add
-                </button>
-              </div>
-
-              <div className="mt-3 flex flex-wrap gap-2">
-                {tags.map((t) => (
-                  <button
-                    key={t}
-                    className="badge badge-outline badge-lg"
-                    onClick={() => removeTag(t)}
-                    type="button"
-                  >
-                    {t} ×
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-6 flex gap-3">
-                <button className="btn btn-success" onClick={addRequest}>
-                  Publish Request
-                </button>
-                <button
-                  className="btn btn-ghost"
-                  onClick={() => {
-                    setTitle("");
-                    setDescription("");
-                    setTags([]);
-                    setTagInput("");
-                  }}
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="md:col-span-2">
-            <div className="space-y-4">
-              {items.length === 0 && (
-                <div className="p-6 text-center text-neutral-400">
-                  No requests yet — add one using the form.
-                </div>
-              )}
-
-              {items.map((it) => (
-                <div
-                  key={it.id}
-                  className="card bg-neutral-900/60 p-4 rounded-lg border border-neutral-800"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="text-sm text-neutral-300">{it.type}</div>
-                      <h3 className="text-xl font-bold text-white">
-                        {it.title}
-                      </h3>
-                      <p className="text-neutral-300 mt-2">{it.description}</p>
-
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {it.tags.map((t) => (
-                          <span
-                            key={t}
-                            className="badge badge-sm badge-outline"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="text-xs text-neutral-500">
-                        {new Date(it.createdAt).toLocaleString()}
-                      </div>
-                      <div className="flex gap-2">
-                        <button className="btn btn-sm btn-ghost">Edit</button>
-                        <button
-                          className="btn btn-sm btn-error"
-                          onClick={() => removeRequest(it.id)}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+    <div className="flex-1 relative">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-white">My Requests</h1>
+        <button
+          className="btn btn-primary btn-circle btn-lg"
+          onClick={() => setIsModalOpen(true)}
+          title="Create new request"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+        </button>
       </div>
+
+      {/* Requests List */}
+      <div className="space-y-4">
+        {items.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-neutral-400 text-lg mb-4">
+              No requests yet
+            </div>
+            <button
+              className="btn btn-primary"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Create your first request
+            </button>
+          </div>
+        )}
+
+        {items.map((it) => (
+          <div
+            key={it.id}
+            className="card bg-neutral-900/60 p-6 rounded-lg border border-neutral-800 hover:border-neutral-700 transition-colors"
+          >
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="badge badge-outline text-xs">
+                    {it.type}
+                  </span>
+                  <span className="text-xs text-neutral-500">
+                    {new Date(it.createdAt).toLocaleString()}
+                  </span>
+                </div>
+                
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {it.title}
+                </h3>
+                
+                <p className="text-neutral-300 mb-4">{it.description}</p>
+
+                {it.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {it.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="badge badge-sm badge-outline"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 ml-4">
+                <button className="btn btn-sm btn-ghost">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  className="btn btn-sm btn-error"
+                  onClick={() => removeRequest(it.id)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Create Request Modal */}
+      <CreateRequestModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddRequest={addRequest}
+      />
     </div>
   );
 }
