@@ -16,11 +16,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="text-blue-600 hover:underline">
               Home
             </Link>
-            <Link href="/find-help" className="text-blue-600 hover:underline">
-              Find Help
+            <Link href="/requests" className="text-blue-600 hover:underline">
+              Requests
             </Link>
-            <Link href="/offer-help" className="text-blue-600 hover:underline">
-              Offer Help
+            <Link href="/offers" className="text-blue-600 hover:underline">
+              Offers
             </Link>
             <Link href="/my-requests" className="text-blue-600 hover:underline">
               My Requests
