@@ -1,8 +1,9 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "My Next.js App",
-  description: "A clean Next.js + Tailwind setup",
+  title: "42 Helper",
+  description:
+    "A platform that connects 42 students who need help with those eager to offer it — whether for fun, collaboration, or project work.",
 };
 
 export default function RootLayout({
