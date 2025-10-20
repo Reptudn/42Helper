@@ -73,7 +73,7 @@ export default function MyRequestsPage() {
     setItems((s) => s.filter((i) => i.id !== id));
 
   return (
-    <div className="min-h-[60vh]">
+    <div className="flex-1">
       <div className="bg-base-100/10 p-6 rounded-xl border border-neutral-800 shadow-sm">
         <h1 className="text-2xl font-bold mb-4 text-white">My Requests</h1>
 

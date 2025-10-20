@@ -17,14 +17,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="antialiased bg-base-200 text-base-content min-h-screen flex flex-col"
+        className="antialiased bg-neutral-900 text-white min-h-screen flex flex-col"
         data-theme="dark"
       >
         <AuthProvider>
           <Navigation />
 
-          <main className="flex-1 w-full">
-            <div className="max-w-6xl mx-auto p-6 h-full">
+          <main className="flex-1 w-full bg-neutral-900">
+            <div className="max-w-6xl mx-auto p-6 min-h-full">
               {children}
             </div>
           </main>

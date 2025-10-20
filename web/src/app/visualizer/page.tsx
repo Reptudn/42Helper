@@ -108,12 +108,9 @@ export default function VisualizerPage() {
   };
 
   return (
-    <div
-      className="min-h-screen p-6 bg-neutral-900 text-white"
-      ref={containerRef}
-    >
-      <div className="max-w-7xl mx-auto flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Visualizer</h1>
+    <div className="flex-1" ref={containerRef}>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-white">Visualizer</h1>
         <div className="flex items-center gap-2">
           <button
             className="btn btn-primary"

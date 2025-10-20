@@ -75,15 +75,14 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <header className="mb-6">
-          <h1 className="text-4xl font-bold text-white">Live Board</h1>
-          <p className="text-neutral-400 mt-2">
-            All requests and offers (full info). Data comes from PocketBase when
-            available, otherwise local data.
-          </p>
-        </header>
+    <div className="flex-1">
+      <div className="mb-6">
+        <h1 className="text-4xl font-bold text-white">Live Board</h1>
+        <p className="text-neutral-400 mt-2">
+          All requests and offers (full info). Data comes from PocketBase when
+          available, otherwise local data.
+        </p>
+      </div>
 
         {loading && <div className="text-neutral-400">Loading...</div>}
         {error && <div className="text-error">{error}</div>}
@@ -114,7 +113,6 @@ export default function Home() {
             </div>
           ))}
         </section>
-      </div>
-    </main>
+    </div>
   );
 }

@@ -80,17 +80,17 @@ export default function OfferHelpPage() {
   }, []);
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Offers</h1>
+    <div className="flex-1">
+      <h1 className="text-2xl font-bold mb-4 text-white">Offers</h1>
       
-      {loading && <p>Loading offers...</p>}
+      {loading && <p className="text-neutral-400">Loading offers...</p>}
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-900/40 border border-red-600 text-red-300 px-4 py-3 rounded mb-4">
           <p className="font-semibold">Configuration Issue:</p>
           <p>{error}</p>
           <p className="mt-2 text-sm">
-            Go to <a href={config.pocketbase.adminUrl} className="underline" target="_blank" rel="noopener noreferrer">
+            Go to <a href={config.pocketbase.adminUrl} className="underline text-red-200 hover:text-red-100" target="_blank" rel="noopener noreferrer">
               PocketBase Admin
             </a> → Collections → {config.collections.offers} → API Rules and set List/Search rule to empty string (&quot;&quot;) for public access.
           </p>
@@ -98,15 +98,15 @@ export default function OfferHelpPage() {
       )}
       
       {!loading && !error && posts.length === 0 && (
-        <p className="text-gray-500">No offers yet.</p>
+        <p className="text-neutral-400">No offers yet.</p>
       )}
       
       {!loading && !error && posts.length > 0 && (
         <ul className="space-y-4">
           {posts.map((post) => (
-            <li key={post.id} className="p-4 border rounded-md bg-gray-50">
-              <h2 className="font-semibold text-lg">{post.title}</h2>
-              <p className="text-gray-700 mt-2">{post.description}</p>
+            <li key={post.id} className="p-4 border border-neutral-800 rounded-md bg-neutral-900/60">
+              <h2 className="font-semibold text-lg text-white">{post.title}</h2>
+              <p className="text-neutral-300 mt-2">{post.description}</p>
             </li>
           ))}
         </ul>
