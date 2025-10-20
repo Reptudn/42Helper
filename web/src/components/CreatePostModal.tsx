@@ -14,7 +14,6 @@ type PostItem = {
   id: string;
   title: string;
   description: string;
-  tags: string[];
   type: PostType;
   subtype: PostSubtype;
   createdAt: string;
@@ -33,8 +32,6 @@ export default function CreatePostModal({
 }: CreatePostModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
   const [postType, setPostType] = useState<PostType>("request");
   const [subtype, setSubtype] = useState<PostSubtype>("need help with project");
 
@@ -55,15 +52,6 @@ export default function CreatePostModal({
     };
   }, [isOpen, onClose]);
 
-  const addTag = () => {
-    const t = tagInput.trim();
-    if (!t) return;
-    if (!tags.includes(t)) setTags((s) => [...s, t]);
-    setTagInput("");
-  };
-
-  const removeTag = (t: string) => setTags((s) => s.filter((x) => x !== t));
-
   const handleSubmit = () => {
     if (!title.trim() || !description.trim()) return;
     
@@ -71,7 +59,6 @@ export default function CreatePostModal({
       id: crypto.randomUUID(),
       title: title.trim(),
       description: description.trim(),
-      tags,
       type: postType,
       subtype: subtype,
       createdAt: new Date().toISOString(),
@@ -82,8 +69,6 @@ export default function CreatePostModal({
     // Reset form
     setTitle("");
     setDescription("");
-    setTags([]);
-    setTagInput("");
     setPostType("request");
     setSubtype("need help with project");
     onClose();
@@ -178,47 +163,6 @@ export default function CreatePostModal({
                 placeholder="Describe what you need or can offer"
                 rows={4}
               />
-            </div>
-
-            {/* Tags */}
-            <div>
-              <label className="label">
-                <span className="label-text text-white">Tags</span>
-              </label>
-              <div className="flex gap-2">
-                <input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && (e.preventDefault(), addTag())
-                  }
-                  className="input input-bordered flex-1 bg-neutral-800 text-white"
-                  placeholder="Press Enter to add tag"
-                />
-                <button
-                  className="btn btn-primary"
-                  onClick={addTag}
-                  type="button"
-                >
-                  Add
-                </button>
-              </div>
-
-              {/* Display Tags */}
-              {tags.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {tags.map((t) => (
-                    <button
-                      key={t}
-                      className="badge badge-outline badge-lg hover:badge-error"
-                      onClick={() => removeTag(t)}
-                      type="button"
-                    >
-                      {t} ×
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
