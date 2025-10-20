@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { pb } from '../lib/pocketbaseClient';
+import { pb } from '../../lib/pocketbaseClient';
 
 interface UsePocketBaseOptions {
   collection: string;

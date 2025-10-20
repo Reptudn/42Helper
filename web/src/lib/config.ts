@@ -1,6 +1,18 @@
 // Environment configuration for the application
 export const config = {
-  // PocketBase configuration
+  // NextAuth configuration
+  nextAuth: {
+    secret: process.env.NEXTAUTH_SECRET,
+    url: process.env.NEXTAUTH_URL || "http://localhost:3000",
+  },
+  
+  // 42 School OAuth configuration
+  fortyTwo: {
+    clientId: process.env.FORTY_TWO_CLIENT_ID,
+    clientSecret: process.env.FORTY_TWO_CLIENT_SECRET,
+  },
+  
+  // PocketBase configuration (for data storage)
   pocketbase: {
     url: process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://localhost:8090",
     adminUrl: process.env.NEXT_PUBLIC_POCKETBASE_ADMIN_URL || "http://localhost:8090/_/",
