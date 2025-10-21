@@ -54,7 +54,7 @@ export default function CreatePostModal({
       subtype: subtype,
       project: project,
       createdAt: new Date().toISOString(),
-      userId: user.id, // This will create the relationship in PocketBase
+      user: user.id, // Match the database field name
     };
     
     onAddPost(item);

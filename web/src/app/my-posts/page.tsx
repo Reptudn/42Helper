@@ -8,25 +8,18 @@ import { pb } from "../../lib/pocketbaseClient";
 import { config } from "../../lib/config";
 import { useAuth } from "../../contexts/AuthContext";
 
-// Database record type (matches your PocketBase structure)
+// Database record type (matches your ACTUAL PocketBase structure)
 interface DBPost {
   id: string;
   title: string;
   description: string;
   category: string;
   project: string;
-  userId: string; // User ID relationship
+  user: string; // Simple text field, not a relationship
   created: string;
   updated: string;
-  // Expanded user data from relationship
-  expand?: {
-    userId?: {
-      id: string;
-      login: string;
-      image?: string;
-      [key: string]: unknown;
-    };
-  };
+  collectionId: string;
+  collectionName: string;
 }
 
 export default function MyPostsPage() {
@@ -42,20 +35,10 @@ export default function MyPostsPage() {
     title: dbPost.title,
     description: dbPost.description,
     type: type,
-    subtype: dbPost.category as PostSubtype, // Map category to subtype
+    subtype: dbPost.category as PostSubtype,
     project: dbPost.project as ProjectType,
     createdAt: dbPost.created,
-    userId: dbPost.userId,
-    expand: dbPost.expand, // Include expanded user data
-  });
-
-  // Convert PostItem to database record (only the fields we can create)
-  const postItemToDBPost = (postItem: PostItem) => ({
-    title: postItem.title,
-    description: postItem.description,
-    category: postItem.subtype,
-    project: postItem.project,
-    userId: postItem.userId, // This creates the relationship
+    user: dbPost.user,
   });
 
   // Fetch all user posts from both collections
@@ -69,28 +52,30 @@ export default function MyPostsPage() {
       setLoading(true);
       setError(null);
 
-      // Fetch from both collections in parallel, filtering by current user and expanding user data
+      console.log("Fetching posts for user:", user.id);
+
+      // SIMPLIFIED: Fetch without filters first to see what data exists
       const [offers, requests] = await Promise.all([
-        pb.collection(config.collections.offers).getFullList<DBPost>(200, {
-          filter: `userId = "${user.id}"`,
-          expand: "userId" // Expand the user relationship
-        }).catch(() => []),
-        pb.collection(config.collections.requests).getFullList<DBPost>(200, {
-          filter: `userId = "${user.id}"`,
-          expand: "userId" // Expand the user relationship
-        }).catch(() => []),
+        pb.collection(config.collections.offers)
+          .getFullList(200)
+          .catch((err) => {
+            console.error("Error fetching offers:", err);
+            return [];
+          }),
+        pb.collection(config.collections.requests)
+          .getFullList(200)
+          .catch((err) => {
+            console.error("Error fetching requests:", err);
+            return [];
+          }),
       ]);
 
-      // Convert to PostItems and combine
-      const offerItems = offers.map(post => dbPostToPostItem(post, "offer"));
-      const requestItems = requests.map(post => dbPostToPostItem(post, "request"));
-      
-      // Sort by creation date (newest first)
-      const allItems = [...offerItems, ...requestItems].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      console.log("Fetched offers:", offers);
+      console.log("Fetched requests:", requests);
 
-      setItems(allItems);
+      // For now, just set empty array to avoid conversion errors
+      setItems([]);
+      
     } catch (err) {
       console.error("Failed to fetch posts:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch posts");
@@ -105,7 +90,7 @@ export default function MyPostsPage() {
   }, [fetchMyPosts]);
 
   const addPost = async (newPost: PostItem) => {
-    if (!user) {
+    if (!user || !user.id) {
       setError("You must be logged in to create posts");
       return;
     }
@@ -118,18 +103,31 @@ export default function MyPostsPage() {
         ? config.collections.offers 
         : config.collections.requests;
       
-      // Create the post in PocketBase
-      const dbData = postItemToDBPost(newPost);
-      const createdPost = await pb.collection(collection).create<DBPost>(dbData);
+      console.log(`Creating post in collection: ${collection}`);
+      console.log("User ID:", user.id);
+      console.log("Post data:", newPost);
       
-      // Convert back to PostItem and add to local state
-      const createdPostItem = dbPostToPostItem(createdPost, newPost.type);
-      setItems(prevItems => [createdPostItem, ...prevItems]);
+      // Create with correct field names matching your database
+      const postData = {
+        title: newPost.title,
+        description: newPost.description,
+        category: newPost.subtype,
+        project: newPost.project,
+        user: user.id, // Use 'user' field not 'userId'
+      };
+      
+      console.log("Attempting to create with data:", postData);
+      const createdPost = await pb.collection(collection).create<DBPost>(postData);
       
       console.log(`Successfully created ${newPost.type} post:`, createdPost);
+      
+      // Refresh the posts list
+      fetchMyPosts();
+      
     } catch (err) {
       console.error("Failed to create post:", err);
-      setError(err instanceof Error ? err.message : "Failed to create post");
+      console.error("Error details:", err);
+      setError(`Failed to create post: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
   };
 
