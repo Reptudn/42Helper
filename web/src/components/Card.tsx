@@ -18,6 +18,8 @@ export default function Card({
   userImageUrl,
   intraName,
 }: CardComponentProps) {
+  const [imageError, setImageError] = React.useState(false);
+
   // Map project types to a specific background gradient, border color and text color.
   const hexToRgba = (hex: string, alpha = 1) => {
     const h = hex.replace("#", "");
@@ -200,10 +202,10 @@ export default function Card({
         <hr className="my-4 border-black/20 border-dashed" />
 
         {/* Get if the user is online and then show the seat */}
-        {userImageUrl && intraName ? (
-          <footer className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="text-black/70 font-medium text-sm">from</span>
+        <footer className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-black/70 font-medium text-sm">from</span>
+            {intraName ? (
               <a
                 href={`https://profile.intra.42.fr/users/${encodeURIComponent(
                   intraName
@@ -213,26 +215,59 @@ export default function Card({
                 className="flex items-center gap-2.5 no-underline hover:opacity-80 transition-opacity"
                 aria-label={`Open ${intraName} profile in new tab`}
               >
-                <Image
-                  src={userImageUrl}
-                  alt={`${intraName} avatar`}
-                  width={40}
-                  height={40}
-                  className="rounded-full border-2 border-black/20 shadow-md"
-                />
+                {userImageUrl && !imageError ? (
+                  <Image
+                    src={userImageUrl}
+                    alt={`${intraName} avatar`}
+                    width={40}
+                    height={40}
+                    className="rounded-full border-2 border-black/20 shadow-md object-cover w-10 h-10 flex-shrink-0"
+                    onError={() => setImageError(true)}
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full border-2 border-black/20 shadow-md bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 text-white"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                )}
                 <span className="text-black/90 font-bold text-sm sm:text-base underline decoration-2 underline-offset-2">
                   {intraName}
                 </span>
               </a>
-            </div>
-          </footer>
-        ) : (
-          <footer className="mt-4 text-center">
-            <span className="text-black/50 text-sm italic font-medium">
-              Anonymous Post
-            </span>
-          </footer>
-        )}
+            ) : (
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-full border-2 border-black/20 shadow-md bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-white"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <span className="text-black/50 text-sm italic font-medium">
+                  Anonymous
+                </span>
+              </div>
+            )}
+          </div>
+        </footer>
       </div>
     </article>
   );
