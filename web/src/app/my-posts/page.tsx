@@ -107,13 +107,13 @@ export default function MyPostsPage() {
       console.log("User ID:", user.id);
       console.log("Post data:", newPost);
       
-      // Create with correct field names matching your database
+      // Create with simple user name as text
       const postData = {
         title: newPost.title,
         description: newPost.description,
         category: newPost.subtype,
         project: newPost.project,
-        user: user.id, // Use 'user' field not 'userId'
+        user: user.name || user.email || "Anonymous", // Simple text username
       };
       
       console.log("Attempting to create with data:", postData);

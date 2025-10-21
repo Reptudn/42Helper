@@ -54,7 +54,7 @@ export default function CreatePostModal({
       subtype: subtype,
       project: project,
       createdAt: new Date().toISOString(),
-      user: user.id, // Match the database field name
+      user: user.name || user.email || "Anonymous", // Simple text username
     };
     
     onAddPost(item);

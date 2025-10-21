@@ -11,17 +11,9 @@ interface HelpPost {
   description: string;
   category: string;
   project: string;
-  userId: string;
+  user: string; // Simple text field
   created: string;
   updated: string;
-  expand?: {
-    userId?: {
-      id: string;
-      login: string;
-      image?: string;
-      [key: string]: unknown;
-    };
-  };
 }
 
 export default function OfferHelpPage() {
@@ -45,7 +37,6 @@ export default function OfferHelpPage() {
         const records = await pb.collection(config.collections.offers).getFullList<HelpPost>(200, {
           // Pass the abort signal to cancel the request if component unmounts
           signal: controller.signal,
-          expand: "userId", // Expand user relationship
         });
         
         console.log("Successfully fetched records:", records);
@@ -125,8 +116,7 @@ export default function OfferHelpPage() {
               description={post.description}
               category={post.category}
               project={post.project}
-              userImageUrl={post.expand?.userId?.login ? `https://cdn.intra.42.fr/users/${post.expand.userId.login}.jpg` : undefined}
-              intraName={post.expand?.userId?.login}
+              intraName={post.user} // Use simple user text field
             />
           ))}
         </div>
