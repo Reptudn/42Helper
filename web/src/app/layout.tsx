@@ -23,10 +23,8 @@ export default function RootLayout({
         <AuthProvider>
           <Navigation />
 
-          <main className="flex-1 w-full bg-neutral-900">
-            <div className="max-w-6xl mx-auto p-6 min-h-full">
-              {children}
-            </div>
+          <main className="flex-1 w-full bg-neutral-900 flex flex-col">
+            {children}
           </main>
 
           <Footer />

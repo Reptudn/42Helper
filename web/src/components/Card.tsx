@@ -173,7 +173,8 @@ export default function Card({
 
         <hr className="my-3 border-black/10" />
 
-        {(userImageUrl && intraName) ? (
+        {/* Get if the user is online and then show the seat */}
+        {userImageUrl && intraName ? (
           <footer className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="text-black/90 font-semibold">from</span>

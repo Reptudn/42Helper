@@ -8,44 +8,41 @@ export default function Navigation() {
   const { user } = useAuth();
 
   return (
-    <header className="bg-neutral-900/40 backdrop-blur-sm border-b border-neutral-800 p-4">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
-          {/* Brand badge + name */}
-          <Link href="/" className="flex items-center gap-3 no-underline">
-            {/* <div className="w-10 h-10 rounded-md bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-sm font-extrabold text-black shadow-md">
-              42
-            </div> */}
-            <span className="text-2xl font-bold text-white">
+    <header className="bg-black/95 backdrop-blur-sm border-b border-neutral-800 px-8 py-4 shrink-0">
+      <div className="w-full flex items-center justify-between gap-4">
+        <div className="flex items-center gap-8">
+          {/* Brand with gradient */}
+          <Link href="/" className="flex items-center gap-3 no-underline group">
+            <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">
               42 Helper
             </span>
           </Link>
 
-          {/* Nav buttons */}
+          {/* Nav buttons with neon hover effects */}
           <nav className="hidden sm:flex items-center gap-2">
             <Link
               href="/requests"
-              className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
+              className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-cyan-500/10 hover:text-cyan-400 hover:border-cyan-500/50 transition-all border border-transparent"
             >
               Requests
             </Link>
             <Link
               href="/offers"
-              className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
+              className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-purple-500/10 hover:text-purple-400 hover:border-purple-500/50 transition-all border border-transparent"
             >
               Offers
             </Link>
             {user && (
               <Link
                 href="/my-posts"
-                className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
+                className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/50 transition-all border border-transparent"
               >
                 My Posts
               </Link>
             )}
             <Link
               href="/visualizer"
-              className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
+              className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-purple-500/10 hover:text-white hover:border-neutral-600 transition-all border border-transparent"
             >
               Visualizer
             </Link>
@@ -53,7 +50,6 @@ export default function Navigation() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* <LoginWithIntra href="/api/auth/intra" /> */}
           <AuthNavigation />
         </div>
       </div>
