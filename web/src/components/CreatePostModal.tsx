@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { PostType, PostSubtype, ProjectType, PostItem } from "../types/posts";
+import { useAuth } from "../contexts/AuthContext";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function CreatePostModal({
   const [postType, setPostType] = useState<PostType>("request");
   const [subtype, setSubtype] = useState<PostSubtype>("i need help with");
   const [project, setProject] = useState<ProjectType>("libft");
+  const { user } = useAuth();
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -39,6 +41,10 @@ export default function CreatePostModal({
 
   const handleSubmit = () => {
     if (!title.trim() || !description.trim()) return;
+    if (!user || !user.id) {
+      console.error("User must be logged in to create posts");
+      return;
+    }
     
     const item: PostItem = {
       id: crypto.randomUUID(),
@@ -48,6 +54,8 @@ export default function CreatePostModal({
       subtype: subtype,
       project: project,
       createdAt: new Date().toISOString(),
+      userId: user.id,
+      userIntraName: user.login || undefined,
     };
     
     onAddPost(item);

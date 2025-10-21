@@ -11,6 +11,10 @@ interface HelpPost {
   description: string;
   category: string;
   project: string;
+  userId: string;
+  userIntraName?: string;
+  created: string;
+  updated: string;
 }
 
 export default function OfferHelpPage() {
@@ -113,6 +117,8 @@ export default function OfferHelpPage() {
               description={post.description}
               category={post.category}
               project={post.project}
+              userImageUrl={post.userIntraName ? `https://cdn.intra.42.fr/users/${post.userIntraName}.jpg` : undefined}
+              intraName={post.userIntraName}
             />
           ))}
         </div>

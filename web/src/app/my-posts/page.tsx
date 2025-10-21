@@ -15,6 +15,8 @@ interface DBPost {
   description: string;
   category: string;
   project: string;
+  userId: string; // User ID who owns the post
+  userIntraName?: string; // Optional 42 intra username
   created: string;
   updated: string;
 }
@@ -35,6 +37,8 @@ export default function MyPostsPage() {
     subtype: dbPost.category as PostSubtype, // Map category to subtype
     project: dbPost.project as ProjectType,
     createdAt: dbPost.created,
+    userId: dbPost.userId,
+    userIntraName: dbPost.userIntraName,
   });
 
   // Convert PostItem to database record
@@ -43,6 +47,8 @@ export default function MyPostsPage() {
     description: postItem.description,
     category: postItem.subtype,
     project: postItem.project,
+    userId: postItem.userId,
+    userIntraName: postItem.userIntraName,
   });
 
   // Fetch all user posts from both collections
@@ -56,10 +62,14 @@ export default function MyPostsPage() {
       setLoading(true);
       setError(null);
 
-      // Fetch from both collections in parallel
+      // Fetch from both collections in parallel, filtering by current user
       const [offers, requests] = await Promise.all([
-        pb.collection(config.collections.offers).getFullList<DBPost>(200).catch(() => []),
-        pb.collection(config.collections.requests).getFullList<DBPost>(200).catch(() => []),
+        pb.collection(config.collections.offers).getFullList<DBPost>(200, {
+          filter: `userId = "${user.id}"`
+        }).catch(() => []),
+        pb.collection(config.collections.requests).getFullList<DBPost>(200, {
+          filter: `userId = "${user.id}"`
+        }).catch(() => []),
       ]);
 
       // Convert to PostItems and combine

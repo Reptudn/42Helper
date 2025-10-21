@@ -11,6 +11,8 @@ type PBItem = {
   description?: string;
   category?: string;
   project?: string;
+  userId?: string;
+  userIntraName?: string;
   tags?: string[];
   created?: string;
   collection?: string;
@@ -98,13 +100,12 @@ export default function Home() {
                 category={item.category ?? item._kind ?? ""}
                 project={item.project ?? "other"}
                 userImageUrl={
-                  item.userImageUrl ??
-                  item.avatar ??
-                  item.imageUrl ??
-                  "https://via.placeholder.com/150"
+                  item.userIntraName 
+                    ? `https://cdn.intra.42.fr/users/${item.userIntraName}.jpg`
+                    : item.userImageUrl ?? item.avatar ?? item.imageUrl ?? undefined
                 }
                 intraName={
-                  item.intraName ?? item.owner ?? item.user ?? "anonymous"
+                  item.userIntraName ?? item.intraName ?? item.owner ?? item.user ?? undefined
                 }
               />
               <div className="mt-2 text-sm text-neutral-400">

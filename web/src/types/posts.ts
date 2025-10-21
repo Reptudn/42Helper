@@ -33,4 +33,6 @@ export type PostItem = {
   subtype: PostSubtype;
   project: ProjectType;
   createdAt: string;
+  userId: string; // ID of the user who owns this post
+  userIntraName?: string; // Optional: 42 intra username for display
 };

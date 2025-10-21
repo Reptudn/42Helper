@@ -11,6 +11,10 @@ interface HelpRequest {
   description: string;
   category: string;
   project: string;
+  userId: string;
+  userIntraName?: string;
+  created: string;
+  updated: string;
 }
 
 export default function RequestsPage() {
@@ -114,6 +118,8 @@ export default function RequestsPage() {
               description={request.description}
               category={request.category}
               project={request.project}
+              userImageUrl={request.userIntraName ? `https://cdn.intra.42.fr/users/${request.userIntraName}.jpg` : undefined}
+              intraName={request.userIntraName}
             />
           ))}
         </div>
