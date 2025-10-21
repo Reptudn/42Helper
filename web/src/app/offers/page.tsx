@@ -11,6 +11,9 @@ interface HelpPost {
   description: string;
   category: string;
   project: string;
+  user: string; // Simple text field
+  created: string;
+  updated: string;
 }
 
 export default function OfferHelpPage() {
@@ -172,6 +175,7 @@ export default function OfferHelpPage() {
                 description={post.description}
                 category={post.category}
                 project={post.project}
+                intraName={post.user}
               />
             </div>
           ))}

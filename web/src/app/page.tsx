@@ -12,6 +12,7 @@ export type PBItem = {
   description?: string;
   category?: string;
   project?: string;
+  userId?: string;
   tags?: string[];
   created?: string;
   collection?: string;
@@ -21,6 +22,14 @@ export type PBItem = {
   intraName?: string;
   owner?: string;
   user?: string;
+  expand?: {
+    userId?: {
+      id: string;
+      login: string;
+      image?: string;
+      [key: string]: unknown;
+    };
+  };
 } & Record<string, unknown>;
 
 export default function Home() {
@@ -38,15 +47,21 @@ export default function Home() {
       setLoading(true);
       setError(null);
       try {
-        // Try PocketBase first
+        // Try PocketBase first with expanded user data
         const [reqs, offs] = await Promise.all([
           pb
             .collection(config.collections.requests)
-            .getFullList<PBItem>(showAmount, { signal: controller.signal })
+            .getFullList<PBItem>(200, {
+              signal: controller.signal,
+              expand: "userId",
+            })
             .catch(() => []),
           pb
             .collection(config.collections.offers)
-            .getFullList<PBItem>(showAmount, { signal: controller.signal })
+            .getFullList<PBItem>(200, {
+              signal: controller.signal,
+              expand: "userId",
+            })
             .catch(() => []),
         ]);
 
@@ -187,7 +202,7 @@ export default function Home() {
             <div className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {requests.length > 0 ? (
-                  requests.map((item) => (
+                  requests.slice(0, showAmount).map((item) => (
                     <div key={item.id} className="w-full">
                       <Card
                         title={item.title ?? "Unknown Title"}
@@ -195,12 +210,12 @@ export default function Home() {
                         category={item.category ?? "Unknown Category"}
                         project={item.project ?? "other"}
                         userImageUrl={
-                          item.userImageUrl ??
-                          item.avatar ??
-                          item.imageUrl ??
-                          "https://via.placeholder.com/150"
+                          item.expand?.userId?.login
+                            ? `https://cdn.intra.42.fr/users/${item.expand.userId.login}.jpg`
+                            : item.userImageUrl ?? item.avatar ?? item.imageUrl
                         }
                         intraName={
+                          item.expand?.userId?.login ??
                           item.intraName ??
                           item.owner ??
                           item.user ??
@@ -264,7 +279,7 @@ export default function Home() {
             <div className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {offers.length > 0 ? (
-                  offers.map((item) => (
+                  offers.slice(0, showAmount).map((item) => (
                     <div key={item.id} className="w-full">
                       <Card
                         title={item.title ?? "Unknown Title"}
@@ -272,12 +287,12 @@ export default function Home() {
                         category={item.category ?? "Unknown Category"}
                         project={item.project ?? "other"}
                         userImageUrl={
-                          item.userImageUrl ??
-                          item.avatar ??
-                          item.imageUrl ??
-                          "https://via.placeholder.com/150"
+                          item.expand?.userId?.login
+                            ? `https://cdn.intra.42.fr/users/${item.expand.userId.login}.jpg`
+                            : item.userImageUrl ?? item.avatar ?? item.imageUrl
                         }
                         intraName={
+                          item.expand?.userId?.login ??
                           item.intraName ??
                           item.owner ??
                           item.user ??

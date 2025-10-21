@@ -33,4 +33,5 @@ export type PostItem = {
   subtype: PostSubtype;
   project: ProjectType;
   createdAt: string;
+  user: string; // Simple text field for user identifier
 };

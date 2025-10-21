@@ -24,22 +24,22 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, account, profile }) {
-      console.log("JWT callback:", { account, profile }); // Debug logging
-      
-      // Persist the OAuth access_token to the token right after signin
-      if (account) {
+      // Only log during initial signin, not token refresh
+      if (account && profile) {
+        console.log("JWT callback: Initial signin");
+        
+        // Persist the OAuth access_token to the token right after signin
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
-      }
-      
-      // Add additional user info from 42 profile
-      if (profile) {
+        
+        // Add additional user info from 42 profile
         const fortyTwoProfile = profile as FortyTwoProfile;
         token.login = fortyTwoProfile.login;
         token.image = fortyTwoProfile.image?.link;
         token.campus = fortyTwoProfile.campus?.[0]?.name;
         token.level = fortyTwoProfile.cursus_users?.[0]?.level;
       }
+      // Token refresh case - account and profile are undefined, this is normal
       
       return token;
     },
@@ -63,5 +63,5 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   secret: config.nextAuth.secret,
-  debug: true, // Enable debug mode
+  debug: false, // Disable debug mode for production
 };

@@ -11,6 +11,9 @@ interface HelpRequest {
   description: string;
   category: string;
   project: string;
+  user: string; // Simple text field
+  created: string;
+  updated: string;
 }
 
 export default function RequestsPage() {
@@ -146,7 +149,6 @@ export default function RequestsPage() {
           </p>
         </div>
       )}
-
       {!loading && !error && requests.length === 0 && (
         <div className="text-center py-20">
           <svg
@@ -179,6 +181,7 @@ export default function RequestsPage() {
                 description={request.description}
                 category={request.category}
                 project={request.project}
+                intraName={request.user}
               />
             </div>
           ))}
