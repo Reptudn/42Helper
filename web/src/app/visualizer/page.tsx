@@ -27,6 +27,7 @@ export default function VisualizerPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [nextUpdateIn, setNextUpdateIn] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -64,6 +65,7 @@ export default function VisualizerPage() {
       setOffers(offersData);
       setRequests(requestsData);
       setLastUpdated(new Date());
+      setNextUpdateIn(config.visualizer.refreshIntervalSeconds);
       
     } catch (err) {
       console.error("Failed to fetch visualizer data:", err);
@@ -78,15 +80,30 @@ export default function VisualizerPage() {
     fetchData();
   }, [fetchData]);
 
-  // Auto-refresh every 5 minutes (300,000 ms)
+  // Auto-refresh based on config interval
   useEffect(() => {
+    const intervalMs = config.visualizer.refreshIntervalSeconds * 1000;
     const interval = setInterval(() => {
       console.log("Visualizer: Auto-refreshing data...");
       fetchData();
-    }, 5 * 60 * 1000); // 5 minutes
+    }, intervalMs);
 
     return () => clearInterval(interval);
   }, [fetchData]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    const countdown = setInterval(() => {
+      setNextUpdateIn((prev) => {
+        if (prev <= 1) {
+          return config.visualizer.refreshIntervalSeconds; // Reset when it reaches 0
+        }
+        return prev - 1;
+      });
+    }, 1000); // Update every second
+
+    return () => clearInterval(countdown);
+  }, []);
 
   // Auto-scroll refs for requests and offers
   const reqContainerRef = useRef<HTMLDivElement | null>(null);
@@ -292,7 +309,10 @@ export default function VisualizerPage() {
               {/* Manual refresh button */}
               <button
                 className="btn btn-ghost btn-sm shadow-2xl hover:scale-105 transition-all border border-neutral-600 hover:border-green-500/50 hover:bg-green-500/10"
-                onClick={fetchData}
+                onClick={() => {
+                  fetchData();
+                  setNextUpdateIn(config.visualizer.refreshIntervalSeconds); // Reset countdown
+                }}
                 disabled={loading}
                 title="Refresh data manually"
               >
@@ -371,22 +391,41 @@ export default function VisualizerPage() {
                   </div>
                 )}
                 {!loading && (
-                  <div className="flex items-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 w-3 text-green-400"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span className="text-xs text-green-400">
-                      Updated {lastUpdated.toLocaleTimeString()}
-                    </span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3 text-green-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-xs text-green-400">
+                        Updated {lastUpdated.toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3 text-blue-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-xs text-blue-400">
+                        Next update in {Math.floor(nextUpdateIn / 60)}:{String(nextUpdateIn % 60).padStart(2, '0')}
+                      </span>
+                    </div>
                   </div>
                 )}
                 {error && (

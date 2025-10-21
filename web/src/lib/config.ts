@@ -23,4 +23,11 @@ export const config = {
     offers: process.env.NEXT_PUBLIC_OFFERS_COLLECTION || "offers",
     requests: process.env.NEXT_PUBLIC_REQUESTS_COLLECTION || "requests",
   },
+  
+  // Visualizer configuration
+  visualizer: {
+    // Refresh interval in seconds (default: 300 = 5 minutes)
+    // For testing: set NEXT_PUBLIC_VISUALIZER_REFRESH_INTERVAL=30 in .env.local for 30 seconds
+    refreshIntervalSeconds: parseInt(process.env.NEXT_PUBLIC_VISUALIZER_REFRESH_INTERVAL || "300", 10),
+  },
 } as const;
