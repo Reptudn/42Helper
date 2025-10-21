@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Card from "@/components/Card";
 import { PBItem } from "../page";
+import { pb } from "@/lib/pocketbaseClient";
+import { config } from "@/lib/config";
 
 // Helper types to avoid `any` while supporting vendor-prefixed fullscreen APIs
 type PrefixedDocument = Document & {
@@ -19,24 +21,72 @@ type PrefixedElement = Element & {
   msRequestFullscreen?: () => Promise<void> | void;
 };
 
-const SAMPLE = Array.from({ length: 12 }).map((_, i) => ({
-  id: `s${i}`,
-  title: `Project ${i + 1}`,
-  description: `Short description for project ${i + 1}`,
-  category: ["help needed", "offer help", "test evaluation"][i % 3],
-  project: ["libft", "ft_printf", "get_next_line", "push_swap", "minishell"][
-    i % 5
-  ],
-  userImageUrl: "https://via.placeholder.com/150",
-  intraName: `user${i + 1}`,
-}));
-
 export default function VisualizerPage() {
-  const [offers] = useState<PBItem[]>(SAMPLE);
-  const [requests] = useState<PBItem[]>(SAMPLE);
+  const [offers, setOffers] = useState<PBItem[]>([]);
+  const [requests, setRequests] = useState<PBItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+
+  // Fetch data from PocketBase
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log("Visualizer: Fetching fresh data...");
+      
+      // Fetch both collections in parallel
+      const [offersData, requestsData] = await Promise.all([
+        pb.collection(config.collections.offers)
+          .getFullList<PBItem>(200, {
+            sort: '-created', // Get newest first
+          })
+          .catch((err) => {
+            console.error("Error fetching offers:", err);
+            return [];
+          }),
+        pb.collection(config.collections.requests)
+          .getFullList<PBItem>(200, {
+            sort: '-created', // Get newest first
+          })
+          .catch((err) => {
+            console.error("Error fetching requests:", err);
+            return [];
+          }),
+      ]);
+
+      console.log(`Visualizer: Fetched ${offersData.length} offers and ${requestsData.length} requests`);
+      
+      setOffers(offersData);
+      setRequests(requestsData);
+      setLastUpdated(new Date());
+      
+    } catch (err) {
+      console.error("Failed to fetch visualizer data:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Auto-refresh every 5 minutes (300,000 ms)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Visualizer: Auto-refreshing data...");
+      fetchData();
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(interval);
+  }, [fetchData]);
 
   // Auto-scroll refs for requests and offers
   const reqContainerRef = useRef<HTMLDivElement | null>(null);
@@ -233,17 +283,41 @@ export default function VisualizerPage() {
       <div className="absolute top-0 left-0 right-0 z-50 pointer-events-none">
         <div className="bg-gradient-to-b from-black via-black/95 to-transparent pb-4">
           <div className="relative w-full py-4 px-8">
-            {/* Fullscreen button - positioned absolute top-right */}
-            <button
-              className={`absolute top-4 right-8 z-50 pointer-events-auto btn btn-primary btn-sm shadow-2xl hover:scale-105 transition-all hover:shadow-cyan-500/50 border border-cyan-500/30 ${
+            {/* Action buttons - positioned absolute top-right */}
+            <div className={`absolute top-4 right-8 z-50 pointer-events-auto flex gap-2 ${
                 isFullscreen && !showControls
                   ? "opacity-0 pointer-events-none"
                   : "opacity-100"
-              }`}
-              onClick={() =>
-                isFullscreen ? exitFullscreen() : enterFullscreen()
-              }
-            >
+              }`}>
+              {/* Manual refresh button */}
+              <button
+                className="btn btn-ghost btn-sm shadow-2xl hover:scale-105 transition-all border border-neutral-600 hover:border-green-500/50 hover:bg-green-500/10"
+                onClick={fetchData}
+                disabled={loading}
+                title="Refresh data manually"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {loading ? 'Updating...' : 'Refresh'}
+              </button>
+
+              {/* Fullscreen button */}
+              <button
+                className="btn btn-primary btn-sm shadow-2xl hover:scale-105 transition-all hover:shadow-cyan-500/50 border border-cyan-500/30"
+                onClick={() =>
+                  isFullscreen ? exitFullscreen() : enterFullscreen()
+                }
+              >
               {isFullscreen ? (
                 <>
                   <svg
@@ -278,6 +352,7 @@ export default function VisualizerPage() {
                 </>
               )}
             </button>
+            </div>
 
             {/* Title - centered */}
             <div className="text-center">
@@ -288,6 +363,50 @@ export default function VisualizerPage() {
                 A platform that connects 42 students who need help with those
                 eager to offer it.
               </p>
+              <div className="flex items-center justify-center gap-3 mt-2">
+                {loading && (
+                  <div className="flex items-center gap-2">
+                    <span className="loading loading-spinner loading-xs text-blue-400"></span>
+                    <span className="text-xs text-blue-400">Updating...</span>
+                  </div>
+                )}
+                {!loading && (
+                  <div className="flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3 text-green-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="text-xs text-green-400">
+                      Updated {lastUpdated.toLocaleTimeString()}
+                    </span>
+                  </div>
+                )}
+                {error && (
+                  <div className="flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3 text-red-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="text-xs text-red-400">Error loading data</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -313,7 +432,7 @@ export default function VisualizerPage() {
               </svg>
               <div>
                 <h2 className="text-3xl font-bold text-white bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  Requests
+                  Requests ({requests.length})
                 </h2>
                 <p className="text-xs text-neutral-400 mt-1">
                   I need help with...
@@ -389,7 +508,7 @@ export default function VisualizerPage() {
               </svg>
               <div>
                 <h2 className="text-3xl font-bold text-white bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-                  Offers
+                  Offers ({offers.length})
                 </h2>
                 <p className="text-xs text-neutral-400 mt-1">
                   I can help with...
