@@ -3,10 +3,10 @@
 export type PostType = "offer" | "request";
 
 export type PostSubtype =
-  | "help with project"
-  | "need help with project" 
-  | "test evaluation"
-  | "can do test evaluation";
+  | "i can help with"
+  | "i need help with"
+  | "i need a test evaluation for"
+  | "i can do a test eval for";
 
 export type ProjectType =
   | "libft"

@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import AuthNavigation from "./AuthNavigation";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Navigation() {
+  const { user } = useAuth();
+
   return (
     <header className="bg-neutral-900/40 backdrop-blur-sm border-b border-neutral-800 p-4">
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
@@ -30,12 +35,14 @@ export default function Navigation() {
             >
               Offers
             </Link>
-            <Link
-              href="/my-posts"
-              className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
-            >
-              My Posts
-            </Link>
+            {user && (
+              <Link
+                href="/my-posts"
+                className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
+              >
+                My Posts
+              </Link>
+            )}
             <Link
               href="/visualizer"
               className="btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
