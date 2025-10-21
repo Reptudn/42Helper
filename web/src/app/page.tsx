@@ -11,6 +11,7 @@ type PBItem = {
   description?: string;
   category?: string;
   project?: string;
+  userId?: string;
   tags?: string[];
   created?: string;
   collection?: string;
@@ -20,6 +21,14 @@ type PBItem = {
   intraName?: string;
   owner?: string;
   user?: string;
+  expand?: {
+    userId?: {
+      id: string;
+      login: string;
+      image?: string;
+      [key: string]: unknown;
+    };
+  };
 } & Record<string, unknown>;
 
 export default function Home() {
@@ -35,15 +44,21 @@ export default function Home() {
       setLoading(true);
       setError(null);
       try {
-        // Try PocketBase first
+        // Try PocketBase first with expanded user data
         const [reqs, offs] = await Promise.all([
           pb
             .collection(config.collections.requests)
-            .getFullList<PBItem>(200, { signal: controller.signal })
+            .getFullList<PBItem>(200, { 
+              signal: controller.signal,
+              expand: "userId"
+            })
             .catch(() => []),
           pb
             .collection(config.collections.offers)
-            .getFullList<PBItem>(200, { signal: controller.signal })
+            .getFullList<PBItem>(200, { 
+              signal: controller.signal,
+              expand: "userId"
+            })
             .catch(() => []),
         ]);
 
@@ -98,13 +113,12 @@ export default function Home() {
                 category={item.category ?? item._kind ?? ""}
                 project={item.project ?? "other"}
                 userImageUrl={
-                  item.userImageUrl ??
-                  item.avatar ??
-                  item.imageUrl ??
-                  "https://via.placeholder.com/150"
+                  item.expand?.userId?.login 
+                    ? `https://cdn.intra.42.fr/users/${item.expand.userId.login}.jpg`
+                    : item.userImageUrl ?? item.avatar ?? item.imageUrl ?? undefined
                 }
                 intraName={
-                  item.intraName ?? item.owner ?? item.user ?? "anonymous"
+                  item.expand?.userId?.login ?? item.intraName ?? item.owner ?? item.user ?? undefined
                 }
               />
               <div className="mt-2 text-sm text-neutral-400">

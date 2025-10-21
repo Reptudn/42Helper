@@ -11,6 +11,9 @@ interface HelpRequest {
   description: string;
   category: string;
   project: string;
+  user: string; // Simple text field
+  created: string;
+  updated: string;
 }
 
 export default function RequestsPage() {
@@ -114,6 +117,7 @@ export default function RequestsPage() {
               description={request.description}
               category={request.category}
               project={request.project}
+              intraName={request.user} // Use simple user text field
             />
           ))}
         </div>
