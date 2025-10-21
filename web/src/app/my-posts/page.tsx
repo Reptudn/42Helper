@@ -1,39 +1,148 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import CreatePostModal from "../../components/CreatePostModal";
 import ProtectedRoute from "../../components/ProtectedRoute";
-import { PostItem } from "../../types/posts";
+import { PostItem, PostSubtype, ProjectType } from "../../types/posts";
+import { pb } from "../../lib/pocketbaseClient";
+import { config } from "../../lib/config";
+import { useAuth } from "../../contexts/AuthContext";
 
-const STORAGE_KEY = "my_posts_v1";
+// Database record type (matches your PocketBase structure)
+interface DBPost {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  project: string;
+  created: string;
+  updated: string;
+}
 
 export default function MyPostsPage() {
   const [items, setItems] = useState<PostItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw));
-    } catch (e) {
-      console.error("Failed to read posts from localStorage", e);
+  // Convert database record to PostItem
+  const dbPostToPostItem = (dbPost: DBPost, type: "offer" | "request"): PostItem => ({
+    id: dbPost.id,
+    title: dbPost.title,
+    description: dbPost.description,
+    type: type,
+    subtype: dbPost.category as PostSubtype, // Map category to subtype
+    project: dbPost.project as ProjectType,
+    createdAt: dbPost.created,
+  });
+
+  // Convert PostItem to database record
+  const postItemToDBPost = (postItem: PostItem) => ({
+    title: postItem.title,
+    description: postItem.description,
+    category: postItem.subtype,
+    project: postItem.project,
+  });
+
+  // Fetch all user posts from both collections
+  const fetchMyPosts = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
     }
-  }, []);
 
-  useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch (e) {
-      console.error("Failed to store posts", e);
-    }
-  }, [items]);
+      setLoading(true);
+      setError(null);
 
-  const addPost = (newPost: PostItem) => {
-    setItems((s) => [newPost, ...s]);
+      // Fetch from both collections in parallel
+      const [offers, requests] = await Promise.all([
+        pb.collection(config.collections.offers).getFullList<DBPost>(200).catch(() => []),
+        pb.collection(config.collections.requests).getFullList<DBPost>(200).catch(() => []),
+      ]);
+
+      // Convert to PostItems and combine
+      const offerItems = offers.map(post => dbPostToPostItem(post, "offer"));
+      const requestItems = requests.map(post => dbPostToPostItem(post, "request"));
+      
+      // Sort by creation date (newest first)
+      const allItems = [...offerItems, ...requestItems].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      setItems(allItems);
+    } catch (err) {
+      console.error("Failed to fetch posts:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch posts");
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Load posts on component mount
+  useEffect(() => {
+    fetchMyPosts();
+  }, [fetchMyPosts]);
+
+  const addPost = async (newPost: PostItem) => {
+    if (!user) {
+      setError("You must be logged in to create posts");
+      return;
+    }
+
+    try {
+      setError(null);
+      
+      // Determine which collection to use based on post type
+      const collection = newPost.type === "offer" 
+        ? config.collections.offers 
+        : config.collections.requests;
+      
+      // Create the post in PocketBase
+      const dbData = postItemToDBPost(newPost);
+      const createdPost = await pb.collection(collection).create<DBPost>(dbData);
+      
+      // Convert back to PostItem and add to local state
+      const createdPostItem = dbPostToPostItem(createdPost, newPost.type);
+      setItems(prevItems => [createdPostItem, ...prevItems]);
+      
+      console.log(`Successfully created ${newPost.type} post:`, createdPost);
+    } catch (err) {
+      console.error("Failed to create post:", err);
+      setError(err instanceof Error ? err.message : "Failed to create post");
+    }
   };
 
-  const removePost = (id: string) =>
-    setItems((s) => s.filter((i) => i.id !== id));
+  const removePost = async (id: string) => {
+    if (!user) {
+      setError("You must be logged in to delete posts");
+      return;
+    }
+
+    try {
+      setError(null);
+      
+      // Find the post to determine which collection it belongs to
+      const post = items.find(item => item.id === id);
+      if (!post) return;
+
+      const collection = post.type === "offer" 
+        ? config.collections.offers 
+        : config.collections.requests;
+
+      // Delete from PocketBase
+      await pb.collection(collection).delete(id);
+      
+      // Remove from local state
+      setItems(prevItems => prevItems.filter(item => item.id !== id));
+      
+      console.log(`Successfully deleted ${post.type} post:`, id);
+    } catch (err) {
+      console.error("Failed to delete post:", err);
+      setError(err instanceof Error ? err.message : "Failed to delete post");
+    }
+  };
 
   return (
     <ProtectedRoute>
@@ -63,9 +172,25 @@ export default function MyPostsPage() {
           </button>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-900/40 border border-red-600 text-red-300 px-4 py-3 rounded mb-4">
+            <p className="font-semibold">Error:</p>
+            <p>{error}</p>
+          </div>
+        )}
+
         {/* Posts List */}
         <div className="space-y-4">
-          {items.length === 0 && (
+          {loading && (
+            <div className="text-center py-12">
+              <div className="text-neutral-400 text-lg">
+                Loading your posts...
+              </div>
+            </div>
+          )}
+
+          {!loading && items.length === 0 && (
             <div className="text-center py-12">
               <div className="text-neutral-400 text-lg mb-4">
                 No posts yet
@@ -79,7 +204,7 @@ export default function MyPostsPage() {
             </div>
           )}
 
-          {items.map((it) => (
+          {!loading && items.map((it) => (
             <div
               key={it.id}
               className="card bg-neutral-900/60 p-6 rounded-lg border border-neutral-800 hover:border-neutral-700 transition-colors"

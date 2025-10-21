@@ -22,7 +22,8 @@ const SAMPLE = Array.from({ length: 12 }).map((_, i) => ({
   id: `s${i}`,
   title: `Project ${i + 1}`,
   description: `Short description for project ${i + 1}`,
-  tags: ["help", "cpp", "review"].slice(0, (i % 3) + 1),
+  category: ["help needed", "offer help", "test evaluation"][(i % 3)],
+  project: ["libft", "ft_printf", "get_next_line", "push_swap", "minishell"][(i % 5)],
   userImageUrl: "https://via.placeholder.com/150",
   intraName: `user${i + 1}`,
 }));
@@ -127,9 +128,10 @@ export default function VisualizerPage() {
         {items.map((it) => (
           <Card
             key={it.id}
-            projectTitle={it.title}
+            title={it.title}
             description={it.description}
-            tags={it.tags}
+            category={it.category}
+            project={it.project}
             userImageUrl={it.userImageUrl}
             intraName={it.intraName}
           />

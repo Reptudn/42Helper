@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { pb } from "../../lib/pocketbaseClient";
 import { config } from "../../lib/config";
+import Card from "../../components/Card";
 
 interface HelpRequest {
   id: string;
   title: string;
   description: string;
+  category: string;
+  project: string;
 }
 
 export default function RequestsPage() {
@@ -103,14 +106,17 @@ export default function RequestsPage() {
       )}
       
       {!loading && !error && requests.length > 0 && (
-        <ul className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {requests.map((request) => (
-            <li key={request.id} className="p-4 border border-neutral-800 rounded-md bg-neutral-900/60">
-              <h2 className="font-semibold text-lg text-white">{request.title}</h2>
-              <p className="text-neutral-300 mt-2">{request.description}</p>
-            </li>
+            <Card
+              key={request.id}
+              title={request.title}
+              description={request.description}
+              category={request.category}
+              project={request.project}
+            />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

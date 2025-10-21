@@ -9,6 +9,8 @@ type PBItem = {
   id: string;
   title?: string;
   description?: string;
+  category?: string;
+  project?: string;
   tags?: string[];
   created?: string;
   collection?: string;
@@ -91,9 +93,10 @@ export default function Home() {
           {combined.map((item) => (
             <div key={item.id} className="w-full">
               <Card
-                projectTitle={item.title ?? item.collection ?? item._kind}
+                title={item.title ?? item.collection ?? item._kind}
                 description={item.description ?? ""}
-                tags={item.tags ?? []}
+                category={item.category ?? item._kind ?? ""}
+                project={item.project ?? "other"}
                 userImageUrl={
                   item.userImageUrl ??
                   item.avatar ??
