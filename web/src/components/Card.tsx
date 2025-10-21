@@ -135,56 +135,82 @@ export default function Card({
 
   return (
     <article
-      className="w-full max-w-xs sm:max-w-sm md:max-w-md rounded-2xl overflow-hidden relative mx-auto"
+      className="w-full max-w-xs sm:max-w-sm md:max-w-md rounded-lg relative mx-auto transition-all duration-300 hover:scale-[1.02] hover:-rotate-1 group cursor-pointer"
       style={{
-        boxShadow: `0 12px 30px rgba(0,0,0,0.5), 0 8px 24px ${hexToRgba(
+        boxShadow: `0 4px 6px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.2), 0 1px 3px ${hexToRgba(
           colors.border,
-          0.12
+          0.3
         )}`,
+        filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.15))",
       }}
     >
+      {/* Paper texture overlay */}
       <div
-        className="p-4 sm:p-6 rounded-2xl"
+        className="absolute inset-0 rounded-lg opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <div
+        className="p-5 sm:p-7 rounded-lg relative"
         style={{
           background: colors.bg,
-          border: `4px solid ${colors.border}`,
+          border: `3px solid ${colors.border}`,
+          borderTop: `4px solid ${colors.border}`,
         }}
       >
-        <header className="text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-black">
+        {/* Tape effect at top */}
+        <div
+          className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-6 opacity-30"
+          style={{
+            background: "rgba(255,255,255,0.4)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+            backdropFilter: "blur(2px)",
+          }}
+        />
+
+        <header className="text-center mb-3">
+          <h2
+            className="text-2xl sm:text-3xl font-bold text-black tracking-tight"
+            style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
+          >
             {title}
           </h2>
         </header>
 
-        <hr className="my-3 border-black/10" />
+        <hr className="my-4 border-black/20 border-dashed" />
 
-        <p className="text-sm sm:text-base italic text-black/80 min-h-[3.5rem]">
+        <p
+          className="text-sm sm:text-base text-black/85 min-h-[3.5rem] leading-relaxed font-medium"
+          style={{ fontFamily: "ui-serif, Georgia, serif" }}
+        >
           {description}
         </p>
 
-        <div className="mt-4 flex flex-wrap gap-2 justify-center">
-          <span className="badge badge-primary text-xs sm:text-sm">
+        <div className="mt-5 flex flex-wrap gap-2 justify-center">
+          <span className="badge badge-primary text-xs sm:text-sm font-semibold shadow-sm px-3 py-2.5">
             {category}
           </span>
-          <span className="badge badge-secondary text-xs sm:text-sm">
+          <span className="badge badge-secondary text-xs sm:text-sm font-semibold shadow-sm px-3 py-2.5">
             {project}
           </span>
         </div>
 
-        <hr className="my-3 border-black/10" />
+        <hr className="my-4 border-black/20 border-dashed" />
 
         {/* Get if the user is online and then show the seat */}
         {userImageUrl && intraName ? (
           <footer className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="text-black/90 font-semibold">from</span>
+              <span className="text-black/70 font-medium text-sm">from</span>
               <a
                 href={`https://profile.intra.42.fr/users/${encodeURIComponent(
                   intraName
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 no-underline"
+                className="flex items-center gap-2.5 no-underline hover:opacity-80 transition-opacity"
                 aria-label={`Open ${intraName} profile in new tab`}
               >
                 <Image
@@ -192,9 +218,9 @@ export default function Card({
                   alt={`${intraName} avatar`}
                   width={40}
                   height={40}
-                  className="rounded-full"
+                  className="rounded-full border-2 border-black/20 shadow-md"
                 />
-                <span className="text-black/90 font-semibold text-sm sm:text-base">
+                <span className="text-black/90 font-bold text-sm sm:text-base underline decoration-2 underline-offset-2">
                   {intraName}
                 </span>
               </a>
@@ -202,7 +228,9 @@ export default function Card({
           </footer>
         ) : (
           <footer className="mt-4 text-center">
-            <span className="text-black/60 text-sm">Anonymous Post</span>
+            <span className="text-black/50 text-sm italic font-medium">
+              Anonymous Post
+            </span>
           </footer>
         )}
       </div>
