@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Card from "@/components/Card";
 import { pb } from "@/lib/pocketbaseClient";
 import { config } from "@/lib/config";
+import Link from "next/link";
 
 type PBItem = {
   id: string;
@@ -28,6 +29,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const showAmount = 3;
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -39,11 +42,11 @@ export default function Home() {
         const [reqs, offs] = await Promise.all([
           pb
             .collection(config.collections.requests)
-            .getFullList<PBItem>(200, { signal: controller.signal })
+            .getFullList<PBItem>(showAmount, { signal: controller.signal })
             .catch(() => []),
           pb
             .collection(config.collections.offers)
-            .getFullList<PBItem>(200, { signal: controller.signal })
+            .getFullList<PBItem>(showAmount, { signal: controller.signal })
             .catch(() => []),
         ]);
 
@@ -71,31 +74,30 @@ export default function Home() {
     return () => controller.abort();
   }, []);
 
-  const combined = [
-    ...offers.map((o) => ({ ...o, _kind: "offer" })),
-    ...requests.map((r) => ({ ...r, _kind: "request" })),
-  ];
-
   return (
     <div className="flex-1">
-      <div className="mb-6">
-        <h1 className="text-4xl font-bold text-white">Live Board</h1>
-        <p className="text-neutral-400 mt-2">
-          All requests and offers (full info). Data comes from PocketBase when
-          available, otherwise local data.
-        </p>
+      <div className="m-6">
+        <h1 className="text-4xl font-bold text-white">Welcome to 42 Helper</h1>
+        <h3 className="text-xl text-white">
+          A platform that connects 42 students who need help with those eager to
+          offer it.
+        </h3>
       </div>
+      <hr />
+      {loading && <div className="text-neutral-400">Loading...</div>}
+      {error && <div className="text-error">{error}</div>}
 
-        {loading && <div className="text-neutral-400">Loading...</div>}
-        {error && <div className="text-error">{error}</div>}
-
-        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {combined.map((item) => (
+      <h2 className="text-xl text-white mt-6">
+        Requests ("I need help with...")
+      </h2>
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {requests.length > 0 ? (
+          requests.map((item) => (
             <div key={item.id} className="w-full">
               <Card
-                title={item.title ?? item.collection ?? item._kind}
+                title={item.title ?? "Unknown Title"}
                 description={item.description ?? ""}
-                category={item.category ?? item._kind ?? ""}
+                category={item.category ?? "Unknown Category"}
                 project={item.project ?? "other"}
                 userImageUrl={
                   item.userImageUrl ??
@@ -108,14 +110,64 @@ export default function Home() {
                 }
               />
               <div className="mt-2 text-sm text-neutral-400">
-                <div>Type: {item._kind}</div>
                 {item.created && (
                   <div>Created: {new Date(item.created).toLocaleString()}</div>
                 )}
               </div>
             </div>
-          ))}
-        </section>
+          ))
+        ) : (
+          <div className="text-neutral-400">
+            No requests available at the moment.
+          </div>
+        )}
+        <Link
+          href="/requests"
+          className="w-full h-full border border-white/20 rounded-md p-2 flex items-center justify-center btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
+        >
+          See more Requests
+        </Link>
+      </section>
+
+      <h2 className="text-xl text-white">Offers ("I can help with...")</h2>
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {offers.length > 0 ? (
+          offers.map((item) => (
+            <div key={item.id} className="w-full">
+              <Card
+                title={item.title ?? "Unknown Title"}
+                description={item.description ?? ""}
+                category={item.category ?? "Unknown Category"}
+                project={item.project ?? "other"}
+                userImageUrl={
+                  item.userImageUrl ??
+                  item.avatar ??
+                  item.imageUrl ??
+                  "https://via.placeholder.com/150"
+                }
+                intraName={
+                  item.intraName ?? item.owner ?? item.user ?? "anonymous"
+                }
+              />
+              <div className="mt-2 text-sm text-neutral-400">
+                {item.created && (
+                  <div>Created: {new Date(item.created).toLocaleString()}</div>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-neutral-400">
+            No offers available at the moment.
+          </div>
+        )}
+        <Link
+          href="/offers"
+          className="w-full h-full border border-white/20 rounded-md p-2 flex items-center justify-center btn btn-ghost btn-sm rounded-md text-neutral-300 hover:bg-neutral-800/40 hover:text-white transition"
+        >
+          See more Offers
+        </Link>
+      </section>
     </div>
   );
 }

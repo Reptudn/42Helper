@@ -39,7 +39,7 @@ export default function CreatePostModal({
 
   const handleSubmit = () => {
     if (!title.trim() || !description.trim()) return;
-    
+
     const item: PostItem = {
       id: crypto.randomUUID(),
       title: title.trim(),
@@ -49,9 +49,9 @@ export default function CreatePostModal({
       project: project,
       createdAt: new Date().toISOString(),
     };
-    
+
     onAddPost(item);
-    
+
     // Reset form
     setTitle("");
     setDescription("");
@@ -127,12 +127,16 @@ export default function CreatePostModal({
                 {postType === "offer" ? (
                   <>
                     <option value="i can help with">I can help with</option>
-                    <option value="i can do a test eval for">I can do a test eval for</option>
+                    <option value="i can do a test eval for">
+                      I can do a test eval for
+                    </option>
                   </>
                 ) : (
                   <>
                     <option value="i need help with">I need help with</option>
-                    <option value="i need a test evaluation for">I need a test evaluation for</option>
+                    <option value="i need a test evaluation for">
+                      I need a test evaluation for
+                    </option>
                   </>
                 )}
               </select>
@@ -183,11 +187,7 @@ export default function CreatePostModal({
 
           {/* Modal Actions */}
           <div className="modal-action">
-            <button
-              className="btn btn-error"
-              onClick={onClose}
-              type="button"
-            >
+            <button className="btn btn-error" onClick={onClose} type="button">
               Cancel
             </button>
             <button
