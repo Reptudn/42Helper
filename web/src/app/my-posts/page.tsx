@@ -2,24 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import CreatePostModal from "../../components/CreatePostModal";
-
-type PostType = "offer" | "request";
-
-type PostSubtype =
-  | "help with project"
-  | "need help with project" 
-  | "test evaluation"
-  | "can do test evaluation";
-
-type PostItem = {
-  id: string;
-  title: string;
-  description: string;
-  tags: string[];
-  type: PostType;
-  subtype: PostSubtype;
-  createdAt: string;
-};
+import { PostItem } from "../../types/posts";
 
 const STORAGE_KEY = "my_posts_v1";
 
@@ -108,6 +91,9 @@ export default function MyPostsPage() {
                   <span className="badge badge-outline text-xs">
                     {it.subtype}
                   </span>
+                  <span className="badge badge-secondary text-xs">
+                    {it.project}
+                  </span>
                   <span className="text-xs text-neutral-500">
                     {new Date(it.createdAt).toLocaleString()}
                   </span>
@@ -118,19 +104,6 @@ export default function MyPostsPage() {
                 </h3>
                 
                 <p className="text-neutral-300 mb-4">{it.description}</p>
-
-                {it.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {it.tags.map((t) => (
-                      <span
-                        key={t}
-                        className="badge badge-sm badge-outline"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <div className="flex gap-2 ml-4">

@@ -1,23 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
-type PostType = "offer" | "request";
-
-type PostSubtype =
-  | "help with project"
-  | "need help with project" 
-  | "test evaluation"
-  | "can do test evaluation";
-
-type PostItem = {
-  id: string;
-  title: string;
-  description: string;
-  type: PostType;
-  subtype: PostSubtype;
-  createdAt: string;
-};
+import { PostType, PostSubtype, ProjectType, PostItem } from "../types/posts";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -34,6 +18,7 @@ export default function CreatePostModal({
   const [description, setDescription] = useState("");
   const [postType, setPostType] = useState<PostType>("request");
   const [subtype, setSubtype] = useState<PostSubtype>("need help with project");
+  const [project, setProject] = useState<ProjectType>("libft");
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -61,6 +46,7 @@ export default function CreatePostModal({
       description: description.trim(),
       type: postType,
       subtype: subtype,
+      project: project,
       createdAt: new Date().toISOString(),
     };
     
@@ -71,6 +57,7 @@ export default function CreatePostModal({
     setDescription("");
     setPostType("request");
     setSubtype("need help with project");
+    setProject("libft");
     onClose();
   };
 
@@ -123,7 +110,7 @@ export default function CreatePostModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="input input-bordered w-full bg-neutral-800 text-white"
-                placeholder="Short title"
+                placeholder="Enter title..."
               />
             </div>
 
@@ -151,6 +138,34 @@ export default function CreatePostModal({
               </select>
             </div>
 
+            {/* Project Selection */}
+            <div>
+              <label className="label">
+                <span className="label-text text-white">Project</span>
+              </label>
+              <select
+                value={project}
+                onChange={(e) => setProject(e.target.value as ProjectType)}
+                className="select select-bordered w-full bg-neutral-800 text-white"
+              >
+                <option value="libft">libft</option>
+                <option value="ft_printf">ft_printf</option>
+                <option value="get_next_line">get_next_line</option>
+                <option value="born2beroot">born2beroot</option>
+                <option value="so_long">so_long</option>
+                <option value="pipex">pipex</option>
+                <option value="push_swap">push_swap</option>
+                <option value="minishell">minishell</option>
+                <option value="philosophers">philosophers</option>
+                <option value="cub3d">cub3d</option>
+                <option value="cpp">CPP modules</option>
+                <option value="webserv">webserv</option>
+                <option value="inception">inception</option>
+                <option value="other">Other</option>
+                <option value="fun">Fun :D</option>
+              </select>
+            </div>
+
             {/* Description */}
             <div>
               <label className="label">
@@ -160,7 +175,7 @@ export default function CreatePostModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="textarea textarea-bordered w-full bg-neutral-800 text-white"
-                placeholder="Describe what you need or can offer"
+                placeholder="Enter description..."
                 rows={4}
               />
             </div>
