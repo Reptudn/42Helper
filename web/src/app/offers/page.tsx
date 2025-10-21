@@ -12,9 +12,16 @@ interface HelpPost {
   category: string;
   project: string;
   userId: string;
-  userIntraName?: string;
   created: string;
   updated: string;
+  expand?: {
+    userId?: {
+      id: string;
+      login: string;
+      image?: string;
+      [key: string]: unknown;
+    };
+  };
 }
 
 export default function OfferHelpPage() {
@@ -38,6 +45,7 @@ export default function OfferHelpPage() {
         const records = await pb.collection(config.collections.offers).getFullList<HelpPost>(200, {
           // Pass the abort signal to cancel the request if component unmounts
           signal: controller.signal,
+          expand: "userId", // Expand user relationship
         });
         
         console.log("Successfully fetched records:", records);
@@ -117,8 +125,8 @@ export default function OfferHelpPage() {
               description={post.description}
               category={post.category}
               project={post.project}
-              userImageUrl={post.userIntraName ? `https://cdn.intra.42.fr/users/${post.userIntraName}.jpg` : undefined}
-              intraName={post.userIntraName}
+              userImageUrl={post.expand?.userId?.login ? `https://cdn.intra.42.fr/users/${post.expand.userId.login}.jpg` : undefined}
+              intraName={post.expand?.userId?.login}
             />
           ))}
         </div>

@@ -33,6 +33,14 @@ export type PostItem = {
   subtype: PostSubtype;
   project: ProjectType;
   createdAt: string;
-  userId: string; // ID of the user who owns this post
-  userIntraName?: string; // Optional: 42 intra username for display
+  userId: string; // ID of the user who owns this post (relationship)
+  // User data will be expanded from the relationship
+  expand?: {
+    userId?: {
+      id: string;
+      login: string;
+      image?: string;
+      [key: string]: unknown;
+    };
+  };
 };

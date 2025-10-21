@@ -15,10 +15,18 @@ interface DBPost {
   description: string;
   category: string;
   project: string;
-  userId: string; // User ID who owns the post
-  userIntraName?: string; // Optional 42 intra username
+  userId: string; // User ID relationship
   created: string;
   updated: string;
+  // Expanded user data from relationship
+  expand?: {
+    userId?: {
+      id: string;
+      login: string;
+      image?: string;
+      [key: string]: unknown;
+    };
+  };
 }
 
 export default function MyPostsPage() {
@@ -38,17 +46,16 @@ export default function MyPostsPage() {
     project: dbPost.project as ProjectType,
     createdAt: dbPost.created,
     userId: dbPost.userId,
-    userIntraName: dbPost.userIntraName,
+    expand: dbPost.expand, // Include expanded user data
   });
 
-  // Convert PostItem to database record
+  // Convert PostItem to database record (only the fields we can create)
   const postItemToDBPost = (postItem: PostItem) => ({
     title: postItem.title,
     description: postItem.description,
     category: postItem.subtype,
     project: postItem.project,
-    userId: postItem.userId,
-    userIntraName: postItem.userIntraName,
+    userId: postItem.userId, // This creates the relationship
   });
 
   // Fetch all user posts from both collections
@@ -62,13 +69,15 @@ export default function MyPostsPage() {
       setLoading(true);
       setError(null);
 
-      // Fetch from both collections in parallel, filtering by current user
+      // Fetch from both collections in parallel, filtering by current user and expanding user data
       const [offers, requests] = await Promise.all([
         pb.collection(config.collections.offers).getFullList<DBPost>(200, {
-          filter: `userId = "${user.id}"`
+          filter: `userId = "${user.id}"`,
+          expand: "userId" // Expand the user relationship
         }).catch(() => []),
         pb.collection(config.collections.requests).getFullList<DBPost>(200, {
-          filter: `userId = "${user.id}"`
+          filter: `userId = "${user.id}"`,
+          expand: "userId" // Expand the user relationship
         }).catch(() => []),
       ]);
 

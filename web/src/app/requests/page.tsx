@@ -12,9 +12,16 @@ interface HelpRequest {
   category: string;
   project: string;
   userId: string;
-  userIntraName?: string;
   created: string;
   updated: string;
+  expand?: {
+    userId?: {
+      id: string;
+      login: string;
+      image?: string;
+      [key: string]: unknown;
+    };
+  };
 }
 
 export default function RequestsPage() {
@@ -35,10 +42,11 @@ export default function RequestsPage() {
         // Add a small delay to prevent rapid requests
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        // Get all records from the requests collection
+        // Get all records from the requests collection with expanded user data
         const records = await pb.collection(config.collections.requests).getFullList<HelpRequest>(200, {
           // Pass the abort signal to cancel the request if component unmounts
           signal: controller.signal,
+          expand: "userId", // Expand user relationship
         });
         
         console.log("Successfully fetched requests:", records);
@@ -118,8 +126,8 @@ export default function RequestsPage() {
               description={request.description}
               category={request.category}
               project={request.project}
-              userImageUrl={request.userIntraName ? `https://cdn.intra.42.fr/users/${request.userIntraName}.jpg` : undefined}
-              intraName={request.userIntraName}
+              userImageUrl={request.expand?.userId?.login ? `https://cdn.intra.42.fr/users/${request.expand.userId.login}.jpg` : undefined}
+              intraName={request.expand?.userId?.login}
             />
           ))}
         </div>
