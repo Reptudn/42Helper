@@ -13,7 +13,6 @@
 _A platform that connects 42 students who need help with those eager to offer it — whether for fun, collaboration, or project work._
 
 [Features](#-features) •
-[Setup](#-setup) •
 [Architecture](#-architecture) •
 [Contributing](#-contributing) •
 [Team](#-team)
@@ -56,16 +55,6 @@ _A platform that connects 42 students who need help with those eager to offer it
 - Dark theme with neon accents
 - Smooth animations and transitions
 - Project-specific color coding
-
----
-
-## 🚀 Setup
-
-### Prerequisites
-
-- **Node.js** 18+ and npm/yarn
-- **PocketBase** binary
-- **42 API Credentials** (OAuth Client ID & Secret)
 
 ## 🏗️ Architecture
 
