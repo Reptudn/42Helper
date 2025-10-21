@@ -273,7 +273,7 @@ export default function CreatePostModal({
           {/* Modal Actions */}
           <div className="modal-action mt-8 pt-4 border-t border-neutral-800">
             <button
-              className="btn btn-ghost border border-neutral-700 hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 transition-all"
+              className="btn btn-ghost border border-neutral-700 hover:border-neutral-600 hover:bg-neutral-800 transition-all"
               onClick={onClose}
               type="button"
             >
@@ -292,7 +292,7 @@ export default function CreatePostModal({
               Cancel
             </button>
             <button
-              className="btn btn-primary border border-blue-500/50 hover:scale-105 transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:hover:scale-100"
+              className="btn btn-primary btn-lg border-2 border-blue-500/50 hover:scale-[1.02] transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:hover:scale-100"
               onClick={handleSubmit}
               disabled={!title.trim() || !description.trim()}
               type="button"

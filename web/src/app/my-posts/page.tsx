@@ -219,7 +219,7 @@ export default function MyPostsPage() {
               </div>
             </div>
             <button
-              className="btn btn-primary btn-lg border border-blue-500/50 hover:scale-105 transition-all shadow-lg shadow-blue-500/20"
+              className="btn btn-primary btn-lg border-2 border-blue-500/50 hover:scale-[1.02] transition-all shadow-lg shadow-blue-500/30"
               onClick={() => setIsModalOpen(true)}
               title="Create new post"
             >
@@ -276,7 +276,7 @@ export default function MyPostsPage() {
               </svg>
               <p className="text-neutral-400 text-lg mb-6">No posts yet</p>
               <button
-                className="btn btn-primary border border-blue-500/50 hover:scale-105 transition-all"
+                className="btn btn-primary btn-lg border-2 border-blue-500/50 hover:scale-[1.02] transition-all shadow-lg shadow-blue-500/30"
                 onClick={() => setIsModalOpen(true)}
               >
                 Create your first post
@@ -321,7 +321,7 @@ export default function MyPostsPage() {
                   </div>
 
                   <div className="flex gap-2 ml-4">
-                    <button className="btn btn-sm btn-ghost border border-neutral-700 hover:border-blue-500/50 hover:bg-blue-500/10 hover:text-blue-400 transition-all">
+                    <button className="btn btn-sm btn-ghost border border-neutral-700 hover:border-neutral-600 hover:bg-neutral-800 transition-all">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-4 w-4"
@@ -338,7 +338,7 @@ export default function MyPostsPage() {
                       </svg>
                     </button>
                     <button
-                      className="btn btn-sm btn-error border border-red-500/50 bg-red-500/20 hover:bg-red-500/30 transition-all"
+                      className="btn btn-sm btn-ghost border border-red-500/50 hover:border-red-600 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all"
                       onClick={() => removePost(it.id)}
                     >
                       <svg
