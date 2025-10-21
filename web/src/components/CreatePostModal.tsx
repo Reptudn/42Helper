@@ -17,7 +17,7 @@ export default function CreatePostModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [postType, setPostType] = useState<PostType>("request");
-  const [subtype, setSubtype] = useState<PostSubtype>("need help with project");
+  const [subtype, setSubtype] = useState<PostSubtype>("i need help with");
   const [project, setProject] = useState<ProjectType>("libft");
 
   // Handle ESC key to close modal
@@ -56,7 +56,7 @@ export default function CreatePostModal({
     setTitle("");
     setDescription("");
     setPostType("request");
-    setSubtype("need help with project");
+    setSubtype("i need help with");
     setProject("libft");
     onClose();
   };
@@ -89,9 +89,9 @@ export default function CreatePostModal({
                   setPostType(newType);
                   // Auto-set appropriate subtype based on main type
                   if (newType === "offer") {
-                    setSubtype("help with project");
+                    setSubtype("i can help with");
                   } else {
-                    setSubtype("need help with project");
+                    setSubtype("i need help with");
                   }
                 }}
                 className="select select-bordered w-full bg-neutral-800 text-white"
@@ -126,13 +126,13 @@ export default function CreatePostModal({
               >
                 {postType === "offer" ? (
                   <>
-                    <option value="help with project">Help with project</option>
-                    <option value="can do test evaluation">Can do test evaluation</option>
+                    <option value="i can help with">I can help with</option>
+                    <option value="i can do a test eval for">I can do a test eval for</option>
                   </>
                 ) : (
                   <>
-                    <option value="need help with project">Need help with project</option>
-                    <option value="test evaluation">Need test evaluation</option>
+                    <option value="i need help with">I need help with</option>
+                    <option value="i need a test evaluation for">I need a test evaluation for</option>
                   </>
                 )}
               </select>
