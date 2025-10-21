@@ -121,8 +121,12 @@ export default function MyPostsPage() {
       
       console.log(`Successfully created ${newPost.type} post:`, createdPost);
       
-      // Refresh the posts list
-      fetchMyPosts();
+      // Add the new post to the local state immediately for better UX
+      const postItem = dbPostToPostItem(createdPost, newPost.type);
+      setItems(prevItems => [postItem, ...prevItems]);
+      
+      // Also refresh the posts list to ensure consistency
+      await fetchMyPosts();
       
     } catch (err) {
       console.error("Failed to create post:", err);
