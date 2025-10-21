@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { pb } from "../../lib/pocketbaseClient";
 import { config } from "../../lib/config";
+import Card from "../../components/Card";
 
 interface HelpPost {
   id: string;
   title: string;
   description: string;
+  category: string;
+  project: string;
 }
 
 export default function OfferHelpPage() {
@@ -102,14 +105,17 @@ export default function OfferHelpPage() {
       )}
       
       {!loading && !error && posts.length > 0 && (
-        <ul className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {posts.map((post) => (
-            <li key={post.id} className="p-4 border border-neutral-800 rounded-md bg-neutral-900/60">
-              <h2 className="font-semibold text-lg text-white">{post.title}</h2>
-              <p className="text-neutral-300 mt-2">{post.description}</p>
-            </li>
+            <Card
+              key={post.id}
+              title={post.title}
+              description={post.description}
+              category={post.category}
+              project={post.project}
+            />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

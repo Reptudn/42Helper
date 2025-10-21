@@ -2,30 +2,23 @@ import Image from "next/image";
 import React from "react";
 
 interface CardComponentProps {
-  projectTitle: string;
+  title: string;
   description: string;
-  tags: string[];
-  userImageUrl: string;
-  intraName: string;
+  category: string;
+  project: string;
+  userImageUrl?: string;
+  intraName?: string;
 }
 
 export default function Card({
-  projectTitle,
+  title,
   description,
-  tags,
+  category,
+  project,
   userImageUrl,
   intraName,
 }: CardComponentProps) {
-  const badgeVariants = [
-    "badge-primary",
-    "badge-secondary",
-    "badge-accent",
-    "badge-info",
-    "badge-success",
-    "badge-warning",
-  ];
-
-  // Map project types (projectTitle) to a specific background gradient, border color and text color.
+  // Map project types to a specific background gradient, border color and text color.
   const hexToRgba = (hex: string, alpha = 1) => {
     const h = hex.replace("#", "");
     const bigint = parseInt(
@@ -87,6 +80,46 @@ export default function Card({
         border: "#cfcfcf",
         text: "#111",
       },
+      born2beroot: {
+        bg: "linear-gradient(180deg,#ffe6d9 0%, #ffccb3 100%)",
+        border: "#ff9966",
+        text: "#000",
+      },
+      so_long: {
+        bg: "linear-gradient(180deg,#e6e6ff 0%, #ccccff 100%)",
+        border: "#9999ff",
+        text: "#000",
+      },
+      pipex: {
+        bg: "linear-gradient(180deg,#fff0e6 0%, #ffe0cc 100%)",
+        border: "#ffcc99",
+        text: "#000",
+      },
+      cub3d: {
+        bg: "linear-gradient(180deg,#f0f0f0 0%, #e0e0e0 100%)",
+        border: "#cccccc",
+        text: "#111",
+      },
+      cpp: {
+        bg: "linear-gradient(180deg,#ffe6f2 0%, #ffcce6 100%)",
+        border: "#ff99cc",
+        text: "#000",
+      },
+      webserv: {
+        bg: "linear-gradient(180deg,#e6fff2 0%, #ccffe6 100%)",
+        border: "#99ff99",
+        text: "#000",
+      },
+      inception: {
+        bg: "linear-gradient(180deg,#f2e6ff 0%, #e6ccff 100%)",
+        border: "#cc99ff",
+        text: "#000",
+      },
+      fun: {
+        bg: "linear-gradient(180deg,#ffebcd 0%, #ffd700 100%)",
+        border: "#ffb347",
+        text: "#000",
+      },
       // fallback for all other projects
       other: {
         bg: "linear-gradient(180deg,#efe6ff 0%, #d6c1ff 100%)",
@@ -98,7 +131,7 @@ export default function Card({
     return map[key] ?? map.other;
   };
 
-  const colors = getProjectColors(projectTitle);
+  const colors = getProjectColors(project);
 
   return (
     <article
@@ -119,7 +152,7 @@ export default function Card({
       >
         <header className="text-center">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-black">
-            {projectTitle}
+            {title}
           </h2>
         </header>
 
@@ -129,54 +162,48 @@ export default function Card({
           {description}
         </p>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {tags && tags.length > 0 ? (
-            tags.map((t, i) => (
-              <span
-                key={t + i}
-                className={`badge badge-soft ${
-                  badgeVariants[i % badgeVariants.length]
-                } text-xs sm:text-sm`}
-              >
-                {t}
-              </span>
-            ))
-          ) : (
-            <span className="badge badge-ghost">no tags</span>
-          )}
+        <div className="mt-4 flex flex-wrap gap-2 justify-center">
+          <span className="badge badge-primary text-xs sm:text-sm">
+            {category}
+          </span>
+          <span className="badge badge-secondary text-xs sm:text-sm">
+            {project}
+          </span>
         </div>
 
         <hr className="my-3 border-black/10" />
 
-        <footer className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="text-black/90 font-semibold">from</span>
-            <a
-              href={`https://profile.intra.42.fr/users/${encodeURIComponent(
-                intraName
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 no-underline"
-              aria-label={`Open ${intraName} profile in new tab`}
-            >
-              <Image
-                src={userImageUrl}
-                alt={`${intraName} avatar`}
-                width={40}
-                height={40}
-                className="rounded-full"
-              />
-              <span className="text-black/90 font-semibold text-sm sm:text-base">
-                {intraName}
-              </span>
-            </a>
-          </div>
-
-          <div className="text-right text-xs text-black/60 hidden sm:block">
-            {/* place for small metadata */}
-          </div>
-        </footer>
+        {(userImageUrl && intraName) ? (
+          <footer className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="text-black/90 font-semibold">from</span>
+              <a
+                href={`https://profile.intra.42.fr/users/${encodeURIComponent(
+                  intraName
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 no-underline"
+                aria-label={`Open ${intraName} profile in new tab`}
+              >
+                <Image
+                  src={userImageUrl}
+                  alt={`${intraName} avatar`}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
+                <span className="text-black/90 font-semibold text-sm sm:text-base">
+                  {intraName}
+                </span>
+              </a>
+            </div>
+          </footer>
+        ) : (
+          <footer className="mt-4 text-center">
+            <span className="text-black/60 text-sm">Anonymous Post</span>
+          </footer>
+        )}
       </div>
     </article>
   );
