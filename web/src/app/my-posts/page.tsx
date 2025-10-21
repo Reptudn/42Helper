@@ -55,20 +55,24 @@ export default function MyPostsPage() {
       setLoading(true);
       setError(null);
 
-      console.log("Fetching posts for user:", user.id);
+      console.log("Fetching posts for user:", user.email || user.id);
 
-      // SIMPLIFIED: Fetch without filters first to see what data exists
+      const userIdentifier = user.name || user.email || user.id;
+
+      // Fetch posts where the user field matches the current user
       const [offers, requests] = await Promise.all([
-        pb
-          .collection(config.collections.offers)
-          .getFullList(200)
+        pb.collection(config.collections.offers)
+          .getFullList<DBPost>(200, {
+            filter: `user = "${userIdentifier}"`,
+          })
           .catch((err) => {
             console.error("Error fetching offers:", err);
             return [];
           }),
-        pb
-          .collection(config.collections.requests)
-          .getFullList(200)
+        pb.collection(config.collections.requests)
+          .getFullList<DBPost>(200, {
+            filter: `user = "${userIdentifier}"`,
+          })
           .catch((err) => {
             console.error("Error fetching requests:", err);
             return [];
@@ -78,8 +82,17 @@ export default function MyPostsPage() {
       console.log("Fetched offers:", offers);
       console.log("Fetched requests:", requests);
 
-      // For now, just set empty array to avoid conversion errors
-      setItems([]);
+      // Convert to PostItems and combine
+      const allPosts: PostItem[] = [
+        ...offers.map(post => dbPostToPostItem(post, "offer")),
+        ...requests.map(post => dbPostToPostItem(post, "request"))
+      ];
+
+      // Sort by creation date (newest first)
+      allPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      setItems(allPosts);
+      
     } catch (err) {
       console.error("Failed to fetch posts:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch posts");
