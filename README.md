@@ -17,6 +17,8 @@ _A platform that connects 42 students who need help with those eager to offer it
 [Contributing](#-contributing) •
 [Team](#-team)
 
+3rd Place in the second official 42 Heilbronn Hackathon in 2025
+
 </div>
 
 ---
@@ -68,39 +70,6 @@ _A platform that connects 42 students who need help with those eager to offer it
 | **Authentication**   | NextAuth.js with 42 OAuth          |
 | **State Management** | React Context API                  |
 | **Deployment**       | Docker, Docker Compose             |
-
-### Project Structure
-
-```
-42Helper/
-├── web/
-│   ├── src/
-│   │   ├── app/                  # Next.js App Router pages
-│   │   │   ├── page.tsx          # Home page
-│   │   │   ├── requests/         # Browse requests
-│   │   │   ├── offers/           # Browse offers
-│   │   │   ├── my-posts/         # User dashboard
-│   │   │   ├── visualizer/       # Live visualizer
-│   │   │   └── login/            # Login page
-│   │   ├── components/           # Reusable React components
-│   │   │   ├── Card.tsx          # Post card component
-│   │   │   ├── CreatePostModal.tsx
-│   │   │   ├── ProtectedRoute.tsx
-│   │   │   └── Navigation.tsx
-│   │   ├── contexts/             # React Context providers
-│   │   │   └── AuthContext.tsx   # Authentication state
-│   │   ├── lib/                  # Utilities and config
-│   │   │   ├── pocketbaseClient.ts
-│   │   │   └── config.ts
-│   │   └── types/                # TypeScript type definitions
-│   ├── public/                   # Static assets
-│   ├── Dockerfile                # Docker configuration
-│   ├── docker-compose.yml        # Docker Compose setup
-│   └── package.json
-└── pocketbase/
-    ├── pocketbase                # PocketBase binary
-    └── start_pocketbase.sh       # Startup script
-```
 
 ## 🤝 Contributing
 
