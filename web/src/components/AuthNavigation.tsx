@@ -39,11 +39,11 @@ export default function AuthNavigation() {
         </div>
         <button
           onClick={logout}
-          className="btn btn-sm btn-error border border-red-500/50 bg-red-500/20 hover:bg-red-500/30 transition-all shadow-lg shadow-red-500/20"
+          className="btn btn-sm bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 border-2 border-red-400/50 hover:border-red-400 text-white font-semibold hover:scale-105 transition-all shadow-xl shadow-red-500/50 hover:shadow-red-500/70"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
+            className="h-5 w-5"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
