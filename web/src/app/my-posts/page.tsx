@@ -27,6 +27,11 @@ export default function MyPostsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    postId: string;
+    postTitle: string;
+  }>({ isOpen: false, postId: "", postTitle: "" });
   const { user } = useAuth();
 
   // Convert database record to PostItem
@@ -158,8 +163,17 @@ export default function MyPostsPage() {
     }
   };
 
-  const removePost = async (id: string) => {
-    if (!user) {
+  const handleDeleteClick = (id: string, title: string) => {
+    setDeleteConfirm({
+      isOpen: true,
+      postId: id,
+      postTitle: title,
+    });
+  };
+
+  const confirmDelete = async () => {
+    const { postId } = deleteConfirm;
+    if (!user || !postId) {
       setError("You must be logged in to delete posts");
       return;
     }
@@ -168,7 +182,7 @@ export default function MyPostsPage() {
       setError(null);
 
       // Find the post to determine which collection it belongs to
-      const post = items.find((item) => item.id === id);
+      const post = items.find((item) => item.id === postId);
       if (!post) return;
 
       const collection =
@@ -177,16 +191,25 @@ export default function MyPostsPage() {
           : config.collections.requests;
 
       // Delete from PocketBase
-      await pb.collection(collection).delete(id);
+      await pb.collection(collection).delete(postId);
 
       // Remove from local state
-      setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+      setItems((prevItems) => prevItems.filter((item) => item.id !== postId));
 
-      console.log(`Successfully deleted ${post.type} post:`, id);
+      console.log(`Successfully deleted ${post.type} post:`, postId);
+      
+      // Close confirmation dialog
+      setDeleteConfirm({ isOpen: false, postId: "", postTitle: "" });
     } catch (err) {
       console.error("Failed to delete post:", err);
       setError(err instanceof Error ? err.message : "Failed to delete post");
+      // Close confirmation dialog even on error
+      setDeleteConfirm({ isOpen: false, postId: "", postTitle: "" });
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm({ isOpen: false, postId: "", postTitle: "" });
   };
 
   return (
@@ -339,7 +362,7 @@ export default function MyPostsPage() {
                     </button>
                     <button
                       className="btn btn-sm btn-ghost border border-red-500/50 hover:border-red-600 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all"
-                      onClick={() => removePost(it.id)}
+                      onClick={() => handleDeleteClick(it.id, it.title)}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -368,6 +391,89 @@ export default function MyPostsPage() {
           onClose={() => setIsModalOpen(false)}
           onAddPost={addPost}
         />
+
+        {/* Delete Confirmation Modal */}
+        <div className={`modal ${deleteConfirm.isOpen ? "modal-open" : ""}`}>
+          <div className="modal-box w-11/12 max-w-lg bg-black/90 backdrop-blur-sm border-2 border-red-500/30 shadow-2xl shadow-red-500/20">
+            {/* Warning Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 rounded-full bg-red-500/20 border-2 border-red-500/50 flex items-center justify-center shadow-lg shadow-red-500/20">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-red-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Title and Message */}
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold text-white mb-3">
+                Delete Post?
+              </h3>
+              <p className="text-neutral-300 mb-4">
+                Are you sure you want to delete this post? This action cannot be undone.
+              </p>
+              <div className="bg-red-900/20 border border-red-600/30 rounded-lg p-4">
+                <p className="text-red-300 font-semibold text-lg">
+                  &ldquo;{deleteConfirm.postTitle}&rdquo;
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 justify-center">
+              <button
+                className="btn btn-ghost border border-neutral-700 hover:border-neutral-600 hover:bg-neutral-800 transition-all min-w-[120px]"
+                onClick={cancelDelete}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Cancel
+              </button>
+              <button
+                className="btn bg-red-600 hover:bg-red-700 border-2 border-red-500/50 text-white hover:scale-[1.02] transition-all shadow-lg shadow-red-500/30 min-w-[120px]"
+                onClick={confirmDelete}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                Delete Post
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={cancelDelete}></div>
+        </div>
       </div>
     </ProtectedRoute>
   );
